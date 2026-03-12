@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Privacy Policy Generator — GDPR Compliant</title>
+  <meta name="description" content="Generate a free, GDPR-compliant privacy policy for your website, app, or SaaS. Answer a few questions and get a ready-to-use policy. No signup required.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @media print { .no-print { display: none !important; } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b no-print">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Privacy Policy Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <div class="no-print mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Privacy Policy Generator</h1>
+      <p class="text-gray-600">Answer a few questions to generate a privacy policy for your website or app.</p>
+    </div>
+
+    <!-- Form -->
+    <div class="no-print bg-white rounded-lg p-6 border mb-8 space-y-5">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Company / Website Name *</label>
+          <input id="pp-name" type="text" placeholder="Acme Inc." class="border rounded px-3 py-2 text-sm w-full" oninput="generatePolicy()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Website URL *</label>
+          <input id="pp-url" type="url" placeholder="https://example.com" class="border rounded px-3 py-2 text-sm w-full" oninput="generatePolicy()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email *</label>
+          <input id="pp-email" type="email" placeholder="privacy@example.com" class="border rounded px-3 py-2 text-sm w-full" oninput="generatePolicy()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+          <input id="pp-country" type="text" placeholder="United States" class="border rounded px-3 py-2 text-sm w-full" oninput="generatePolicy()">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">What type of platform? *</label>
+        <div class="flex flex-wrap gap-3">
+          <label class="flex items-center gap-2 text-sm"><input type="radio" name="platform" value="website" checked onchange="generatePolicy()"> Website</label>
+          <label class="flex items-center gap-2 text-sm"><input type="radio" name="platform" value="app" onchange="generatePolicy()"> Mobile App</label>
+          <label class="flex items-center gap-2 text-sm"><input type="radio" name="platform" value="saas" onchange="generatePolicy()"> SaaS / Web App</label>
+          <label class="flex items-center gap-2 text-sm"><input type="radio" name="platform" value="ecommerce" onchange="generatePolicy()"> E-commerce</label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">What data do you collect?</label>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="name" checked onchange="generatePolicy()"> Name</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="email" checked onchange="generatePolicy()"> Email</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="phone" onchange="generatePolicy()"> Phone number</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="address" onchange="generatePolicy()"> Address</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="payment" onchange="generatePolicy()"> Payment info</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="usage" checked onchange="generatePolicy()"> Usage data</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="cookies" checked onchange="generatePolicy()"> Cookies</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="location" onchange="generatePolicy()"> Location</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="data-type" value="device" onchange="generatePolicy()"> Device info</label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Third-party services used</label>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="Google Analytics" onchange="generatePolicy()"> Google Analytics</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="Stripe" onchange="generatePolicy()"> Stripe</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="Mailchimp" onchange="generatePolicy()"> Mailchimp</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="Facebook Pixel" onchange="generatePolicy()"> Facebook Pixel</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="AWS" onchange="generatePolicy()"> AWS</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="third-party" value="Cloudflare" onchange="generatePolicy()"> Cloudflare</label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Compliance requirements</label>
+        <div class="flex flex-wrap gap-3">
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="compliance" value="gdpr" checked onchange="generatePolicy()"> GDPR (EU)</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="compliance" value="ccpa" onchange="generatePolicy()"> CCPA (California)</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="compliance" value="coppa" onchange="generatePolicy()"> COPPA (Children)</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="bg-white rounded-lg border p-8" id="output">
+      <div class="prose max-w-none" id="policy-content">
+        <p class="text-gray-400 italic">Fill in the form above to generate your privacy policy.</p>
+      </div>
+    </div>
+
+    <div class="no-print flex gap-3 mt-4">
+      <button onclick="copyPolicy()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Copy to Clipboard</button>
+      <button onclick="window.print()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">Print / PDF</button>
+    </div>
+    <p class="no-print text-xs text-gray-400 text-center mt-2">This is a template and not legal advice. Please consult a lawyer for your specific situation.</p>
+  </main>
+
+  <script>
+    function getVal(id) { return document.getElementById(id).value.trim(); }
+    function getChecked(cls) { return [...document.querySelectorAll(`.${cls}:checked`)].map(el => el.value); }
+    function getPlatform() { return document.querySelector('input[name="platform"]:checked')?.value || 'website'; }
+
+    function generatePolicy() {
+      const name = getVal('pp-name') || '[Company Name]';
+      const url = getVal('pp-url') || '[Website URL]';
+      const email = getVal('pp-email') || '[contact@email.com]';
+      const country = getVal('pp-country') || '[Country]';
+      const platform = getPlatform();
+      const dataTypes = getChecked('data-type');
+      const thirdParties = getChecked('third-party');
+      const compliance = getChecked('compliance');
+      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const platformName = { website: 'website', app: 'mobile application', saas: 'web application', ecommerce: 'e-commerce platform' }[platform] || 'website';
+
+      const dataTypeNames = {
+        name: 'Full name', email: 'Email address', phone: 'Phone number',
+        address: 'Mailing address', payment: 'Payment and billing information',
+        usage: 'Usage data (pages visited, time spent, clicks)',
+        cookies: 'Cookies and tracking technologies',
+        location: 'Geographic location data', device: 'Device information (browser, OS, screen size)'
+      };
+
+      let html = `<h1 style="font-size:1.75rem;font-weight:bold;margin-bottom:0.5rem">Privacy Policy</h1>
+<p style="color:#6b7280;margin-bottom:2rem">Last updated: ${today}</p>
+
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">1. Introduction</h2>
+<p>${name} ("we", "us", or "our") operates the ${platformName} at <strong>${url}</strong>. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our ${platformName}.</p>
+<p>By using our ${platformName}, you agree to the collection and use of information in accordance with this policy.</p>
+
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">2. Information We Collect</h2>
+<p>We may collect the following types of personal information:</p>
+<ul style="list-style:disc;padding-left:1.5rem">`;
+
+      for (const dt of dataTypes) {
+        html += `\n<li>${dataTypeNames[dt] || dt}</li>`;
+      }
+
+      html += `\n</ul>
+
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">3. How We Use Your Information</h2>
+<p>We use the collected information for the following purposes:</p>
+<ul style="list-style:disc;padding-left:1.5rem">
+<li>To provide and maintain our ${platformName}</li>
+<li>To notify you about changes to our ${platformName}</li>
+<li>To provide customer support</li>
+<li>To gather analysis or valuable information to improve our ${platformName}</li>
+<li>To monitor the usage of our ${platformName}</li>
+<li>To detect, prevent and address technical issues</li>`;
+
+      if (dataTypes.includes('payment')) {
+        html += `\n<li>To process payments and transactions</li>`;
+      }
+      if (dataTypes.includes('email')) {
+        html += `\n<li>To send you newsletters and marketing communications (with your consent)</li>`;
+      }
+
+      html += `\n</ul>`;
+
+      if (dataTypes.includes('cookies')) {
+        html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">4. Cookies and Tracking</h2>
+<p>We use cookies and similar tracking technologies to track activity on our ${platformName}. Cookies are files with a small amount of data which may include an anonymous unique identifier.</p>
+<p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our ${platformName}.</p>`;
+      }
+
+      if (thirdParties.length > 0) {
+        html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${dataTypes.includes('cookies') ? '5' : '4'}. Third-Party Services</h2>
+<p>We may employ third-party companies and individuals to facilitate our ${platformName}. These third parties have access to your personal information only to perform specific tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
+<p>We use the following third-party services:</p>
+<ul style="list-style:disc;padding-left:1.5rem">`;
+        for (const tp of thirdParties) {
+          html += `\n<li>${tp}</li>`;
+        }
+        html += `\n</ul>`;
+      }
+
+      let sectionNum = (dataTypes.includes('cookies') ? 5 : 4) + (thirdParties.length > 0 ? 1 : 0) + 1;
+
+      html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Data Retention</h2>
+<p>We will retain your personal information only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use your information to the extent necessary to comply with our legal obligations, resolve disputes, and enforce our policies.</p>`;
+      sectionNum++;
+
+      html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Data Security</h2>
+<p>The security of your data is important to us. We use commercially acceptable means to protect your personal information, but no method of transmission over the Internet or method of electronic storage is 100% secure.</p>`;
+      sectionNum++;
+
+      if (compliance.includes('gdpr')) {
+        html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Your Rights Under GDPR</h2>
+<p>If you are a resident of the European Economic Area (EEA), you have certain data protection rights. You have the right to:</p>
+<ul style="list-style:disc;padding-left:1.5rem">
+<li>Access, update, or delete your personal information</li>
+<li>Rectification — correct inaccurate personal data</li>
+<li>Object to processing of your personal data</li>
+<li>Request restriction of processing</li>
+<li>Data portability — receive your data in a structured, machine-readable format</li>
+<li>Withdraw consent at any time</li>
+</ul>
+<p>To exercise these rights, please contact us at <strong>${email}</strong>.</p>`;
+        sectionNum++;
+      }
+
+      if (compliance.includes('ccpa')) {
+        html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Your Rights Under CCPA</h2>
+<p>If you are a California resident, you have the right to:</p>
+<ul style="list-style:disc;padding-left:1.5rem">
+<li>Know what personal data is being collected about you</li>
+<li>Know whether your personal data is sold or disclosed and to whom</li>
+<li>Say no to the sale of personal data</li>
+<li>Access your personal data</li>
+<li>Request deletion of your personal data</li>
+<li>Not be discriminated against for exercising your privacy rights</li>
+</ul>`;
+        sectionNum++;
+      }
+
+      if (compliance.includes('coppa')) {
+        html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Children's Privacy</h2>
+<p>Our ${platformName} does not address anyone under the age of 13. We do not knowingly collect personal identifiable information from children under 13. If you are a parent or guardian and you are aware that your child has provided us with personal data, please contact us at <strong>${email}</strong>.</p>`;
+        sectionNum++;
+      }
+
+      html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Changes to This Privacy Policy</h2>
+<p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.</p>`;
+      sectionNum++;
+
+      html += `
+<h2 style="font-size:1.25rem;font-weight:600;margin-top:1.5rem">${sectionNum}. Contact Us</h2>
+<p>If you have any questions about this Privacy Policy, please contact us:</p>
+<ul style="list-style:disc;padding-left:1.5rem">
+<li>By email: <strong>${email}</strong></li>
+<li>By visiting: <strong>${url}</strong></li>
+</ul>`;
+
+      document.getElementById('policy-content').innerHTML = html;
+    }
+
+    function copyPolicy() {
+      const el = document.getElementById('policy-content');
+      const text = el.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('button');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', generatePolicy);
+  </script>
+</body>
+</html>

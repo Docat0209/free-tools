@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Online Tools — Invoice Generator, Privacy Policy, JSON Formatter</title>
+  <meta name="description" content="Free online tools that run entirely in your browser. No signup, no data collection. Invoice generator, privacy policy generator, JSON formatter and more.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .tool-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .tool-card { transition: all 0.2s ease; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-bold text-gray-900">FreeTools</a>
+      <span class="text-sm text-gray-500">100% client-side — your data never leaves your browser</span>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Free Online Tools</h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Simple, fast, privacy-first tools that run entirely in your browser. No signup required. No data collected.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <a href="/free-tools/invoice/" class="tool-card bg-white rounded-lg p-6 border hover:border-blue-300 block">
+        <div class="text-3xl mb-3">📄</div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Invoice Generator</h2>
+        <p class="text-gray-600 text-sm">Create professional invoices in seconds. Fill in details, preview, and download as PDF. Perfect for freelancers and small businesses.</p>
+        <span class="inline-block mt-3 text-blue-600 text-sm font-medium">Use tool →</span>
+      </a>
+
+      <a href="/free-tools/privacy-policy/" class="tool-card bg-white rounded-lg p-6 border hover:border-green-300 block">
+        <div class="text-3xl mb-3">🔒</div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Privacy Policy Generator</h2>
+        <p class="text-gray-600 text-sm">Generate a GDPR-compliant privacy policy for your website or app. Answer a few questions and get a ready-to-use policy.</p>
+        <span class="inline-block mt-3 text-green-600 text-sm font-medium">Use tool →</span>
+      </a>
+
+      <a href="/free-tools/json/" class="tool-card bg-white rounded-lg p-6 border hover:border-purple-300 block">
+        <div class="text-3xl mb-3">{ }</div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">JSON Formatter</h2>
+        <p class="text-gray-600 text-sm">Format, validate, and beautify JSON data. Minify or pretty-print with syntax highlighting. Convert between JSON and CSV.</p>
+        <span class="inline-block mt-3 text-purple-600 text-sm font-medium">Use tool →</span>
+      </a>
+    </div>
+
+    <div class="mt-16 text-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Why FreeTools?</h2>
+      <div class="grid md:grid-cols-3 gap-8 text-left max-w-3xl mx-auto">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Privacy First</h3>
+          <p class="text-gray-600 text-sm">Everything runs in your browser. We never see, store, or transmit your data.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">No Signup</h3>
+          <p class="text-gray-600 text-sm">Just open and use. No account needed, no email required.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Free Forever</h3>
+          <p class="text-gray-600 text-sm">Core tools are free with no limits. No ads, no upselling tricks.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="max-w-5xl mx-auto px-4 py-8 mt-12 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+  </footer>
+</body>
+</html>

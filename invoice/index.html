@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Invoice Generator — Create Professional Invoices Online</title>
+  <meta name="description" content="Free online invoice generator for freelancers and small businesses. Create, preview, and download professional PDF invoices instantly. No signup required.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; }
+      .print-area { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 20px !important; }
+    }
+    .item-row { display: grid; grid-template-columns: 1fr 80px 100px 100px 40px; gap: 8px; align-items: center; }
+    @media (max-width: 640px) { .item-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Invoice Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Form -->
+      <div class="no-print space-y-6">
+        <h1 class="text-2xl font-bold text-gray-900">Create Invoice</h1>
+
+        <!-- From -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">From (Your Business)</h2>
+          <div class="grid gap-3">
+            <input id="from-name" type="text" placeholder="Business / Your Name" class="border rounded px-3 py-2 text-sm w-full" value="">
+            <input id="from-email" type="email" placeholder="Email" class="border rounded px-3 py-2 text-sm w-full">
+            <textarea id="from-address" placeholder="Address (optional)" rows="2" class="border rounded px-3 py-2 text-sm w-full"></textarea>
+          </div>
+        </div>
+
+        <!-- To -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">Bill To</h2>
+          <div class="grid gap-3">
+            <input id="to-name" type="text" placeholder="Client Name / Company" class="border rounded px-3 py-2 text-sm w-full">
+            <input id="to-email" type="email" placeholder="Client Email" class="border rounded px-3 py-2 text-sm w-full">
+            <textarea id="to-address" placeholder="Client Address (optional)" rows="2" class="border rounded px-3 py-2 text-sm w-full"></textarea>
+          </div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">Invoice Details</h2>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-gray-500">Invoice Number</label>
+              <input id="inv-number" type="text" placeholder="INV-001" class="border rounded px-3 py-2 text-sm w-full">
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Currency</label>
+              <select id="inv-currency" class="border rounded px-3 py-2 text-sm w-full">
+                <option value="$">USD ($)</option>
+                <option value="€">EUR (€)</option>
+                <option value="£">GBP (£)</option>
+                <option value="¥">JPY (¥)</option>
+                <option value="NT$">TWD (NT$)</option>
+                <option value="CA$">CAD (CA$)</option>
+                <option value="A$">AUD (A$)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Issue Date</label>
+              <input id="inv-date" type="date" class="border rounded px-3 py-2 text-sm w-full">
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Due Date</label>
+              <input id="inv-due" type="date" class="border rounded px-3 py-2 text-sm w-full">
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">Line Items</h2>
+          <div class="space-y-2" id="items-container">
+            <div class="item-row text-xs text-gray-500 font-medium">
+              <span>Description</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span>
+            </div>
+          </div>
+          <button onclick="addItem()" class="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">+ Add Line Item</button>
+
+          <div class="mt-4 pt-4 border-t">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-gray-500">Tax Rate (%)</label>
+                <input id="tax-rate" type="number" value="0" min="0" max="100" step="0.1" class="border rounded px-3 py-2 text-sm w-full" oninput="updatePreview()">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500">Discount (%)</label>
+                <input id="discount" type="number" value="0" min="0" max="100" step="0.1" class="border rounded px-3 py-2 text-sm w-full" oninput="updatePreview()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">Notes</h2>
+          <textarea id="notes" placeholder="Payment terms, bank details, thank you message..." rows="3" class="border rounded px-3 py-2 text-sm w-full" oninput="updatePreview()"></textarea>
+        </div>
+
+        <button onclick="window.print()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+          Download as PDF (Print)
+        </button>
+        <p class="text-xs text-gray-400 text-center">Uses your browser's built-in Print to PDF. No data is sent to any server.</p>
+      </div>
+
+      <!-- Preview -->
+      <div class="print-area bg-white rounded-lg border p-8 shadow-sm self-start sticky top-4" id="preview">
+        <div class="flex justify-between items-start mb-8">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">INVOICE</h2>
+            <p class="text-sm text-gray-500 mt-1" id="p-inv-number">#INV-001</p>
+          </div>
+          <div class="text-right text-sm">
+            <p class="font-semibold text-gray-900" id="p-from-name">Your Business</p>
+            <p class="text-gray-500" id="p-from-email"></p>
+            <p class="text-gray-500 whitespace-pre-line" id="p-from-address"></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 mb-8">
+          <div>
+            <p class="text-xs text-gray-400 uppercase font-medium mb-1">Bill To</p>
+            <p class="font-semibold text-gray-900" id="p-to-name">Client Name</p>
+            <p class="text-sm text-gray-500" id="p-to-email"></p>
+            <p class="text-sm text-gray-500 whitespace-pre-line" id="p-to-address"></p>
+          </div>
+          <div class="text-right">
+            <div class="mb-2">
+              <p class="text-xs text-gray-400 uppercase font-medium">Issue Date</p>
+              <p class="text-sm text-gray-700" id="p-date">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 uppercase font-medium">Due Date</p>
+              <p class="text-sm text-gray-700" id="p-due">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full text-sm mb-6">
+          <thead>
+            <tr class="border-b-2 border-gray-200">
+              <th class="text-left py-2 text-gray-500 font-medium">Description</th>
+              <th class="text-right py-2 text-gray-500 font-medium w-16">Qty</th>
+              <th class="text-right py-2 text-gray-500 font-medium w-24">Rate</th>
+              <th class="text-right py-2 text-gray-500 font-medium w-24">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="p-items">
+            <tr class="border-b"><td class="py-2 text-gray-400 italic" colspan="4">No items added</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="flex justify-end">
+          <div class="w-64 space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Subtotal</span>
+              <span class="text-gray-900" id="p-subtotal">$0.00</span>
+            </div>
+            <div class="flex justify-between" id="p-discount-row" style="display:none">
+              <span class="text-gray-500">Discount (<span id="p-discount-pct">0</span>%)</span>
+              <span class="text-red-600" id="p-discount-amt">-$0.00</span>
+            </div>
+            <div class="flex justify-between" id="p-tax-row" style="display:none">
+              <span class="text-gray-500">Tax (<span id="p-tax-pct">0</span>%)</span>
+              <span class="text-gray-900" id="p-tax-amt">$0.00</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t-2 border-gray-900 font-bold text-lg">
+              <span>Total</span>
+              <span id="p-total">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div id="p-notes-section" class="mt-8 pt-4 border-t" style="display:none">
+          <p class="text-xs text-gray-400 uppercase font-medium mb-1">Notes</p>
+          <p class="text-sm text-gray-600 whitespace-pre-line" id="p-notes"></p>
+        </div>
+
+        <div class="mt-8 pt-4 border-t text-center text-xs text-gray-400">
+          Generated at freetools — freetools.dev
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let itemCount = 0;
+
+    function addItem() {
+      itemCount++;
+      const container = document.getElementById('items-container');
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.id = `item-${itemCount}`;
+      row.innerHTML = `
+        <input type="text" placeholder="Item description" class="border rounded px-2 py-1.5 text-sm" oninput="updatePreview()">
+        <input type="number" placeholder="1" value="1" min="0" class="border rounded px-2 py-1.5 text-sm text-right" oninput="updatePreview()">
+        <input type="number" placeholder="0.00" value="" min="0" step="0.01" class="border rounded px-2 py-1.5 text-sm text-right" oninput="updatePreview()">
+        <span class="text-sm text-gray-700 text-right font-medium">$0.00</span>
+        <button onclick="removeItem(${itemCount})" class="text-red-400 hover:text-red-600 text-lg">&times;</button>
+      `;
+      container.appendChild(row);
+      updatePreview();
+    }
+
+    function removeItem(id) {
+      document.getElementById(`item-${id}`)?.remove();
+      updatePreview();
+    }
+
+    function getItems() {
+      const rows = document.querySelectorAll('#items-container .item-row:not(:first-child)');
+      const items = [];
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        if (inputs.length >= 3) {
+          const desc = inputs[0].value || 'Item';
+          const qty = parseFloat(inputs[1].value) || 0;
+          const rate = parseFloat(inputs[2].value) || 0;
+          items.push({ desc, qty, rate, amount: qty * rate });
+        }
+      });
+      return items;
+    }
+
+    function getCurrency() {
+      return document.getElementById('inv-currency').value;
+    }
+
+    function fmt(n) {
+      return getCurrency() + n.toFixed(2);
+    }
+
+    function updatePreview() {
+      const c = getCurrency();
+      // Update text fields
+      document.getElementById('p-from-name').textContent = document.getElementById('from-name').value || 'Your Business';
+      document.getElementById('p-from-email').textContent = document.getElementById('from-email').value;
+      document.getElementById('p-from-address').textContent = document.getElementById('from-address').value;
+      document.getElementById('p-to-name').textContent = document.getElementById('to-name').value || 'Client Name';
+      document.getElementById('p-to-email').textContent = document.getElementById('to-email').value;
+      document.getElementById('p-to-address').textContent = document.getElementById('to-address').value;
+      document.getElementById('p-inv-number').textContent = '#' + (document.getElementById('inv-number').value || 'INV-001');
+      document.getElementById('p-date').textContent = document.getElementById('inv-date').value || '-';
+      document.getElementById('p-due').textContent = document.getElementById('inv-due').value || '-';
+
+      // Items
+      const items = getItems();
+      const tbody = document.getElementById('p-items');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr class="border-b"><td class="py-2 text-gray-400 italic" colspan="4">No items added</td></tr>';
+      } else {
+        tbody.innerHTML = items.map(item => `
+          <tr class="border-b">
+            <td class="py-2">${escHtml(item.desc)}</td>
+            <td class="py-2 text-right">${item.qty}</td>
+            <td class="py-2 text-right">${fmt(item.rate)}</td>
+            <td class="py-2 text-right font-medium">${fmt(item.amount)}</td>
+          </tr>
+        `).join('');
+      }
+
+      // Update inline amounts
+      const rows = document.querySelectorAll('#items-container .item-row:not(:first-child)');
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const span = row.querySelector('span');
+        if (inputs.length >= 3 && span) {
+          const qty = parseFloat(inputs[1].value) || 0;
+          const rate = parseFloat(inputs[2].value) || 0;
+          span.textContent = fmt(qty * rate);
+        }
+      });
+
+      // Totals
+      const subtotal = items.reduce((s, i) => s + i.amount, 0);
+      const discountPct = parseFloat(document.getElementById('discount').value) || 0;
+      const taxPct = parseFloat(document.getElementById('tax-rate').value) || 0;
+      const discountAmt = subtotal * (discountPct / 100);
+      const afterDiscount = subtotal - discountAmt;
+      const taxAmt = afterDiscount * (taxPct / 100);
+      const total = afterDiscount + taxAmt;
+
+      document.getElementById('p-subtotal').textContent = fmt(subtotal);
+
+      const discountRow = document.getElementById('p-discount-row');
+      if (discountPct > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('p-discount-pct').textContent = discountPct;
+        document.getElementById('p-discount-amt').textContent = '-' + fmt(discountAmt);
+      } else {
+        discountRow.style.display = 'none';
+      }
+
+      const taxRow = document.getElementById('p-tax-row');
+      if (taxPct > 0) {
+        taxRow.style.display = 'flex';
+        document.getElementById('p-tax-pct').textContent = taxPct;
+        document.getElementById('p-tax-amt').textContent = fmt(taxAmt);
+      } else {
+        taxRow.style.display = 'none';
+      }
+
+      document.getElementById('p-total').textContent = fmt(total);
+
+      // Notes
+      const notes = document.getElementById('notes').value;
+      const notesSection = document.getElementById('p-notes-section');
+      if (notes) {
+        notesSection.style.display = 'block';
+        document.getElementById('p-notes').textContent = notes;
+      } else {
+        notesSection.style.display = 'none';
+      }
+    }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      document.getElementById('inv-date').value = today.toISOString().split('T')[0];
+      const due = new Date(today);
+      due.setDate(due.getDate() + 30);
+      document.getElementById('inv-due').value = due.toISOString().split('T')[0];
+
+      addItem();
+
+      // Live preview on all inputs
+      document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', updatePreview);
+        el.addEventListener('change', updatePreview);
+      });
+      updatePreview();
+    });
+  </script>
+</body>
+</html>

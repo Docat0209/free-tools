@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free JSON Formatter & Validator — Beautify, Minify, Convert</title>
+  <meta name="description" content="Free online JSON formatter, validator, and converter. Beautify, minify, and validate JSON data. Convert between JSON and CSV. No signup, runs in your browser.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    textarea { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; tab-size: 2; }
+    .error-banner { animation: shake 0.3s ease-in-out; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">JSON Formatter</span>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-xl font-bold text-gray-900">JSON Formatter & Validator</h1>
+      <div class="flex gap-2">
+        <button onclick="formatJson()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">Beautify</button>
+        <button onclick="minifyJson()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200">Minify</button>
+        <button onclick="validateJson()" class="bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700">Validate</button>
+        <button onclick="toCSV()" class="bg-purple-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-purple-700">→ CSV</button>
+        <button onclick="clearAll()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-200">Clear</button>
+      </div>
+    </div>
+
+    <div id="error-bar" class="hidden mb-3 p-3 rounded-lg text-sm font-medium"></div>
+
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-sm font-medium text-gray-600">Input</label>
+          <div class="flex gap-2">
+            <button onclick="pasteFromClipboard()" class="text-xs text-blue-600 hover:text-blue-800">Paste</button>
+            <button onclick="loadSample()" class="text-xs text-blue-600 hover:text-blue-800">Sample</button>
+          </div>
+        </div>
+        <textarea id="input" rows="28" class="w-full border rounded-lg p-3 bg-white resize-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Paste your JSON here..." oninput="autoFormat()"></textarea>
+        <div class="flex justify-between mt-1">
+          <span class="text-xs text-gray-400" id="input-stats">0 chars</span>
+          <button onclick="copyInput()" class="text-xs text-blue-600 hover:text-blue-800">Copy</button>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-sm font-medium text-gray-600">Output</label>
+          <span class="text-xs text-gray-400" id="output-label"></span>
+        </div>
+        <textarea id="output" rows="28" class="w-full border rounded-lg p-3 bg-gray-50 resize-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" readonly placeholder="Formatted output will appear here..."></textarea>
+        <div class="flex justify-between mt-1">
+          <span class="text-xs text-gray-400" id="output-stats">0 chars</span>
+          <button onclick="copyOutput()" class="text-xs text-blue-600 hover:text-blue-800">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This JSON Formatter</h2>
+      <p>This free JSON formatter lets you beautify, minify, and validate JSON data directly in your browser. No data is sent to any server — everything runs locally for maximum privacy and speed.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Beautify</strong> — Pretty-print JSON with proper indentation</li>
+        <li><strong>Minify</strong> — Compress JSON by removing whitespace</li>
+        <li><strong>Validate</strong> — Check if your JSON is valid with clear error messages</li>
+        <li><strong>JSON to CSV</strong> — Convert JSON arrays to CSV format</li>
+        <li><strong>Privacy</strong> — 100% client-side, your data never leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+
+    function showError(msg) {
+      const bar = document.getElementById('error-bar');
+      bar.className = 'error-banner mb-3 p-3 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200';
+      bar.textContent = msg;
+    }
+
+    function showSuccess(msg) {
+      const bar = document.getElementById('error-bar');
+      bar.className = 'mb-3 p-3 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200';
+      bar.textContent = msg;
+    }
+
+    function hideMessage() {
+      document.getElementById('error-bar').className = 'hidden mb-3 p-3 rounded-lg text-sm font-medium';
+    }
+
+    function updateStats() {
+      document.getElementById('input-stats').textContent = `${inputEl.value.length} chars`;
+      document.getElementById('output-stats').textContent = `${outputEl.value.length} chars`;
+    }
+
+    function parseInput() {
+      const raw = inputEl.value.trim();
+      if (!raw) { hideMessage(); return null; }
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        showError(`Invalid JSON: ${e.message}`);
+        return null;
+      }
+    }
+
+    function formatJson() {
+      const parsed = parseInput();
+      if (parsed === null && inputEl.value.trim()) return;
+      if (parsed === null) return;
+      outputEl.value = JSON.stringify(parsed, null, 2);
+      document.getElementById('output-label').textContent = 'Beautified';
+      showSuccess('JSON formatted successfully');
+      updateStats();
+    }
+
+    function minifyJson() {
+      const parsed = parseInput();
+      if (parsed === null && inputEl.value.trim()) return;
+      if (parsed === null) return;
+      outputEl.value = JSON.stringify(parsed);
+      document.getElementById('output-label').textContent = 'Minified';
+      showSuccess(`Minified: ${inputEl.value.length} → ${outputEl.value.length} chars`);
+      updateStats();
+    }
+
+    function validateJson() {
+      const raw = inputEl.value.trim();
+      if (!raw) { hideMessage(); return; }
+      try {
+        const parsed = JSON.parse(raw);
+        const type = Array.isArray(parsed) ? 'Array' : typeof parsed;
+        const keys = typeof parsed === 'object' && parsed !== null
+          ? (Array.isArray(parsed) ? `${parsed.length} items` : `${Object.keys(parsed).length} keys`)
+          : '';
+        showSuccess(`Valid JSON! Type: ${type}${keys ? ` (${keys})` : ''}`);
+        outputEl.value = JSON.stringify(parsed, null, 2);
+        document.getElementById('output-label').textContent = 'Validated';
+      } catch (e) {
+        showError(`Invalid JSON: ${e.message}`);
+        outputEl.value = '';
+      }
+      updateStats();
+    }
+
+    function toCSV() {
+      const parsed = parseInput();
+      if (parsed === null && inputEl.value.trim()) return;
+      if (!Array.isArray(parsed)) {
+        showError('JSON must be an array of objects to convert to CSV');
+        return;
+      }
+      if (parsed.length === 0) {
+        showError('Array is empty');
+        return;
+      }
+
+      const headers = [...new Set(parsed.flatMap(obj => typeof obj === 'object' && obj !== null ? Object.keys(obj) : []))];
+      if (headers.length === 0) {
+        showError('Array items must be objects with keys');
+        return;
+      }
+
+      const escape = (val) => {
+        const str = val === null || val === undefined ? '' : String(val);
+        return str.includes(',') || str.includes('"') || str.includes('\n')
+          ? `"${str.replace(/"/g, '""')}"` : str;
+      };
+
+      const lines = [headers.join(',')];
+      for (const row of parsed) {
+        if (typeof row !== 'object' || row === null) continue;
+        lines.push(headers.map(h => escape(row[h])).join(','));
+      }
+
+      outputEl.value = lines.join('\n');
+      document.getElementById('output-label').textContent = 'CSV';
+      showSuccess(`Converted ${parsed.length} rows to CSV`);
+      updateStats();
+    }
+
+    function clearAll() {
+      inputEl.value = '';
+      outputEl.value = '';
+      hideMessage();
+      document.getElementById('output-label').textContent = '';
+      updateStats();
+    }
+
+    function copyInput() { navigator.clipboard.writeText(inputEl.value); }
+    function copyOutput() {
+      navigator.clipboard.writeText(outputEl.value);
+      showSuccess('Copied to clipboard!');
+    }
+
+    function pasteFromClipboard() {
+      navigator.clipboard.readText().then(text => {
+        inputEl.value = text;
+        updateStats();
+      }).catch(() => showError('Cannot read clipboard. Paste manually with Ctrl+V.'));
+    }
+
+    function loadSample() {
+      inputEl.value = JSON.stringify([
+        { "id": 1, "name": "Alice", "email": "alice@example.com", "role": "admin" },
+        { "id": 2, "name": "Bob", "email": "bob@example.com", "role": "user" },
+        { "id": 3, "name": "Charlie", "email": "charlie@example.com", "role": "user" }
+      ]);
+      formatJson();
+    }
+
+    let autoFormatTimeout;
+    function autoFormat() {
+      updateStats();
+      clearTimeout(autoFormatTimeout);
+      autoFormatTimeout = setTimeout(() => {
+        if (inputEl.value.trim()) formatJson();
+      }, 500);
+    }
+
+    updateStats();
+  </script>
+</body>
+</html>
