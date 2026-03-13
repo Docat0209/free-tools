@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free QR Code Generator — Create QR Codes Instantly</title>
+  <meta name="description" content="Free online QR code generator. Create QR codes for URLs, text, email, phone, WiFi, and more. Download as PNG. No signup, runs in your browser.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">QR Code Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">QR Code Generator</h1>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Input -->
+      <div class="space-y-5">
+        <div class="bg-white rounded-lg p-5 border">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+          <div class="grid grid-cols-3 gap-2 mb-4">
+            <button onclick="setType('url')" class="type-btn active px-3 py-2 rounded text-sm font-medium border" data-type="url">URL</button>
+            <button onclick="setType('text')" class="type-btn px-3 py-2 rounded text-sm font-medium border" data-type="text">Text</button>
+            <button onclick="setType('email')" class="type-btn px-3 py-2 rounded text-sm font-medium border" data-type="email">Email</button>
+            <button onclick="setType('phone')" class="type-btn px-3 py-2 rounded text-sm font-medium border" data-type="phone">Phone</button>
+            <button onclick="setType('wifi')" class="type-btn px-3 py-2 rounded text-sm font-medium border" data-type="wifi">WiFi</button>
+            <button onclick="setType('sms')" class="type-btn px-3 py-2 rounded text-sm font-medium border" data-type="sms">SMS</button>
+          </div>
+
+          <!-- URL -->
+          <div id="form-url" class="type-form">
+            <label class="block text-sm text-gray-600 mb-1">URL</label>
+            <input id="input-url" type="url" placeholder="https://example.com" class="border rounded px-3 py-2 text-sm w-full" oninput="generate()">
+          </div>
+
+          <!-- Text -->
+          <div id="form-text" class="type-form hidden">
+            <label class="block text-sm text-gray-600 mb-1">Text</label>
+            <textarea id="input-text" placeholder="Any text..." rows="3" class="border rounded px-3 py-2 text-sm w-full" oninput="generate()"></textarea>
+          </div>
+
+          <!-- Email -->
+          <div id="form-email" class="type-form hidden">
+            <label class="block text-sm text-gray-600 mb-1">Email</label>
+            <input id="input-email" type="email" placeholder="hello@example.com" class="border rounded px-3 py-2 text-sm w-full mb-2" oninput="generate()">
+            <label class="block text-sm text-gray-600 mb-1">Subject (optional)</label>
+            <input id="input-email-subject" type="text" placeholder="Subject" class="border rounded px-3 py-2 text-sm w-full" oninput="generate()">
+          </div>
+
+          <!-- Phone -->
+          <div id="form-phone" class="type-form hidden">
+            <label class="block text-sm text-gray-600 mb-1">Phone Number</label>
+            <input id="input-phone" type="tel" placeholder="+1234567890" class="border rounded px-3 py-2 text-sm w-full" oninput="generate()">
+          </div>
+
+          <!-- WiFi -->
+          <div id="form-wifi" class="type-form hidden">
+            <label class="block text-sm text-gray-600 mb-1">Network Name (SSID)</label>
+            <input id="input-wifi-ssid" type="text" placeholder="MyWiFi" class="border rounded px-3 py-2 text-sm w-full mb-2" oninput="generate()">
+            <label class="block text-sm text-gray-600 mb-1">Password</label>
+            <input id="input-wifi-pass" type="text" placeholder="Password" class="border rounded px-3 py-2 text-sm w-full mb-2" oninput="generate()">
+            <label class="block text-sm text-gray-600 mb-1">Encryption</label>
+            <select id="input-wifi-enc" class="border rounded px-3 py-2 text-sm w-full" onchange="generate()">
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">None</option>
+            </select>
+          </div>
+
+          <!-- SMS -->
+          <div id="form-sms" class="type-form hidden">
+            <label class="block text-sm text-gray-600 mb-1">Phone Number</label>
+            <input id="input-sms-phone" type="tel" placeholder="+1234567890" class="border rounded px-3 py-2 text-sm w-full mb-2" oninput="generate()">
+            <label class="block text-sm text-gray-600 mb-1">Message (optional)</label>
+            <input id="input-sms-msg" type="text" placeholder="Hello!" class="border rounded px-3 py-2 text-sm w-full" oninput="generate()">
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="bg-white rounded-lg p-5 border">
+          <h2 class="font-semibold text-gray-700 mb-3">Options</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">Size</label>
+              <select id="opt-size" class="border rounded px-3 py-2 text-sm w-full" onchange="generate()">
+                <option value="4">Small (132px)</option>
+                <option value="6" selected>Medium (198px)</option>
+                <option value="10">Large (330px)</option>
+                <option value="16">XL (528px)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-600 mb-1">Error Correction</label>
+              <select id="opt-ec" class="border rounded px-3 py-2 text-sm w-full" onchange="generate()">
+                <option value="L">Low (7%)</option>
+                <option value="M" selected>Medium (15%)</option>
+                <option value="Q">Quartile (25%)</option>
+                <option value="H">High (30%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="space-y-4">
+        <div class="bg-white rounded-lg border p-8 flex items-center justify-center min-h-64" id="qr-container">
+          <p class="text-gray-400 text-sm">Enter content to generate a QR code</p>
+        </div>
+        <button onclick="download()" id="download-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          Download PNG
+        </button>
+        <p class="text-xs text-gray-400 text-center">100% client-side — your data never leaves your browser.</p>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This QR Code Generator</h2>
+      <p>Generate QR codes for URLs, plain text, email addresses, phone numbers, WiFi credentials, and SMS messages. All processing happens in your browser — no data is sent to any server.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Supported Types</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>URL</strong> — Link to any website. Scan to open in browser.</li>
+        <li><strong>Text</strong> — Encode any text message.</li>
+        <li><strong>Email</strong> — Opens email compose with prefilled address and subject.</li>
+        <li><strong>Phone</strong> — Scan to dial a phone number.</li>
+        <li><strong>WiFi</strong> — Share WiFi credentials. Scan to auto-connect (Android/iOS).</li>
+        <li><strong>SMS</strong> — Opens SMS with prefilled number and message.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    let currentType = 'url';
+
+    function setType(type) {
+      currentType = type;
+      document.querySelectorAll('.type-form').forEach(f => f.classList.add('hidden'));
+      document.getElementById('form-' + type).classList.remove('hidden');
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.toggle('bg-blue-600', b.dataset.type === type);
+        b.classList.toggle('text-white', b.dataset.type === type);
+        b.classList.toggle('border-blue-600', b.dataset.type === type);
+      });
+      generate();
+    }
+
+    function getData() {
+      switch (currentType) {
+        case 'url': return document.getElementById('input-url').value;
+        case 'text': return document.getElementById('input-text').value;
+        case 'email': {
+          const email = document.getElementById('input-email').value;
+          const subj = document.getElementById('input-email-subject').value;
+          if (!email) return '';
+          return subj ? `mailto:${email}?subject=${encodeURIComponent(subj)}` : `mailto:${email}`;
+        }
+        case 'phone': {
+          const phone = document.getElementById('input-phone').value;
+          return phone ? `tel:${phone}` : '';
+        }
+        case 'wifi': {
+          const ssid = document.getElementById('input-wifi-ssid').value;
+          const pass = document.getElementById('input-wifi-pass').value;
+          const enc = document.getElementById('input-wifi-enc').value;
+          if (!ssid) return '';
+          return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+        }
+        case 'sms': {
+          const phone = document.getElementById('input-sms-phone').value;
+          const msg = document.getElementById('input-sms-msg').value;
+          if (!phone) return '';
+          return msg ? `sms:${phone}?body=${encodeURIComponent(msg)}` : `sms:${phone}`;
+        }
+        default: return '';
+      }
+    }
+
+    function generate() {
+      const data = getData();
+      const container = document.getElementById('qr-container');
+      const btn = document.getElementById('download-btn');
+
+      if (!data) {
+        container.innerHTML = '<p class="text-gray-400 text-sm">Enter content to generate a QR code</p>';
+        btn.disabled = true;
+        return;
+      }
+
+      const ecLevel = document.getElementById('opt-ec').value;
+      const cellSize = parseInt(document.getElementById('opt-size').value);
+      const ecMap = { L: 1, M: 0, Q: 3, H: 2 };
+
+      try {
+        const qr = qrcode(0, ecMap[ecLevel] ?? 0);
+        qr.addData(data);
+        qr.make();
+        container.innerHTML = qr.createSvgTag({ cellSize, margin: 0 });
+        btn.disabled = false;
+      } catch (e) {
+        container.innerHTML = '<p class="text-red-500 text-sm">Content too long for selected error correction level. Try reducing text or lowering error correction.</p>';
+        btn.disabled = true;
+      }
+    }
+
+    function download() {
+      const svg = document.querySelector('#qr-container svg');
+      if (!svg) return;
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      const size = parseInt(svg.getAttribute('width')) || 200;
+      canvas.width = size;
+      canvas.height = size;
+
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, size, size);
+        ctx.drawImage(img, 0, 0);
+        const link = document.createElement('a');
+        link.download = 'qrcode.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    }
+
+    setType('url');
+  </script>
+</body>
+</html>

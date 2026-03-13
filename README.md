@@ -11,6 +11,9 @@ Free online tools that run entirely in your browser. No signup, no data collecti
 | [Invoice Generator](https://docat0209.github.io/free-tools/invoice/) | Create professional invoices. Fill in details, preview, download as PDF. |
 | [Privacy Policy Generator](https://docat0209.github.io/free-tools/privacy-policy/) | Generate GDPR/CCPA-compliant privacy policies for websites and apps. |
 | [JSON Formatter](https://docat0209.github.io/free-tools/json/) | Format, validate, minify JSON. Convert JSON to CSV. |
+| [QR Code Generator](https://docat0209.github.io/free-tools/qr-code/) | Generate QR codes for URLs, text, email, phone, WiFi, SMS. Download as PNG. |
+| [Markdown Preview](https://docat0209.github.io/free-tools/markdown/) | Live Markdown editor with side-by-side preview. GFM support. |
+| [Color Palette Generator](https://docat0209.github.io/free-tools/color-palette/) | Create harmonious color schemes. Analogous, complementary, triadic, and more. |
 
 ## Privacy
 
