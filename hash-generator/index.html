@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Hash Generator — MD5, SHA-1, SHA-256, SHA-512 Online | FreeTools</title>
+  <meta name="description" content="Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text instantly in your browser. Compare hashes, verify file integrity. No signup, no data collection — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .hash-output { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; word-break: break-all; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Hash Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Hash Generator</h1>
+
+    <!-- Input -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <label for="input-text" class="text-sm font-medium text-gray-700 block mb-2">Input Text</label>
+      <textarea id="input-text" rows="4" class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="Type or paste text here..."></textarea>
+      <div class="flex items-center justify-between mt-2">
+        <span id="input-stats" class="text-xs text-gray-500">0 characters</span>
+        <button onclick="document.getElementById('input-text').value=''; computeAll();" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+      </div>
+    </div>
+
+    <!-- Hash Results -->
+    <div class="space-y-3" id="results">
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">MD5</span>
+          <button onclick="copyHash('md5')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="md5">Copy</button>
+        </div>
+        <div id="hash-md5" class="hash-output text-gray-800 min-h-[20px]">—</div>
+      </div>
+
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">SHA-1</span>
+          <button onclick="copyHash('sha1')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="sha1">Copy</button>
+        </div>
+        <div id="hash-sha1" class="hash-output text-gray-800 min-h-[20px]">—</div>
+      </div>
+
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">SHA-256</span>
+          <button onclick="copyHash('sha256')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="sha256">Copy</button>
+        </div>
+        <div id="hash-sha256" class="hash-output text-gray-800 min-h-[20px]">—</div>
+      </div>
+
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">SHA-512</span>
+          <button onclick="copyHash('sha512')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="sha512">Copy</button>
+        </div>
+        <div id="hash-sha512" class="hash-output text-gray-800 min-h-[20px]">—</div>
+      </div>
+    </div>
+
+    <!-- Hash Comparison -->
+    <div class="bg-white border rounded-lg p-5 mt-6 mb-6">
+      <h2 class="text-sm font-medium text-gray-700 mb-3">Compare Hash</h2>
+      <p class="text-xs text-gray-500 mb-2">Paste an expected hash to verify against the generated ones.</p>
+      <div class="flex gap-3">
+        <input type="text" id="compare-input" placeholder="Paste expected hash here..." class="flex-1 border rounded px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-200">
+        <button onclick="compareHash()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Compare</button>
+      </div>
+      <div id="compare-result" class="mt-2 text-sm hidden"></div>
+    </div>
+
+    <!-- Options -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="case" value="lower" checked class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Lowercase</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="case" value="upper" class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Uppercase</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Hash Generator</h2>
+      <p>Generate cryptographic hash digests from any text using the Web Crypto API built into your browser. All computation happens locally — your input is never transmitted anywhere.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Supported Algorithms</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>MD5</strong> — 128-bit hash, widely used for checksums (not for security)</li>
+        <li><strong>SHA-1</strong> — 160-bit hash, legacy but still common for file verification</li>
+        <li><strong>SHA-256</strong> — 256-bit hash from the SHA-2 family, used in TLS, Bitcoin, and more</li>
+        <li><strong>SHA-512</strong> — 512-bit hash from the SHA-2 family, strongest option available</li>
+      </ul>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Common Use Cases</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li>Verify file integrity after download</li>
+        <li>Generate checksums for data validation</li>
+        <li>Compare expected vs. actual hash values</li>
+        <li>Quick hash lookups for development and testing</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input-text');
+    const hashes = {};
+
+    // MD5 implementation (Web Crypto doesn't support MD5, so we use a pure JS implementation)
+    function md5(string) {
+      function rotateLeft(val, shift) { return (val << shift) | (val >>> (32 - shift)); }
+      function addUnsigned(x, y) {
+        const x4 = (x & 0x40000000), y4 = (y & 0x40000000);
+        const x8 = (x & 0x80000000), y8 = (y & 0x80000000);
+        const result = (x & 0x3FFFFFFF) + (y & 0x3FFFFFFF);
+        if (x4 & y4) return (result ^ 0x80000000 ^ x8 ^ y8);
+        if (x4 | y4) {
+          if (result & 0x40000000) return (result ^ 0xC0000000 ^ x8 ^ y8);
+          else return (result ^ 0x40000000 ^ x8 ^ y8);
+        }
+        return (result ^ x8 ^ y8);
+      }
+      function F(x, y, z) { return (x & y) | ((~x) & z); }
+      function G(x, y, z) { return (x & z) | (y & (~z)); }
+      function H(x, y, z) { return (x ^ y ^ z); }
+      function I(x, y, z) { return (y ^ (x | (~z))); }
+      function FF(a, b, c, d, x, s, ac) { a = addUnsigned(a, addUnsigned(addUnsigned(F(b, c, d), x), ac)); return addUnsigned(rotateLeft(a, s), b); }
+      function GG(a, b, c, d, x, s, ac) { a = addUnsigned(a, addUnsigned(addUnsigned(G(b, c, d), x), ac)); return addUnsigned(rotateLeft(a, s), b); }
+      function HH(a, b, c, d, x, s, ac) { a = addUnsigned(a, addUnsigned(addUnsigned(H(b, c, d), x), ac)); return addUnsigned(rotateLeft(a, s), b); }
+      function II(a, b, c, d, x, s, ac) { a = addUnsigned(a, addUnsigned(addUnsigned(I(b, c, d), x), ac)); return addUnsigned(rotateLeft(a, s), b); }
+      function convertToWordArray(str) {
+        const len = str.length;
+        const nw = (((len + 8) >>> 6) + 1) * 16;
+        const wa = new Array(nw - 1);
+        let pos = 0, wc = 0;
+        while (pos < len) {
+          wc = (pos >>> 2);
+          wa[wc] = (wa[wc] || 0) | ((str.charCodeAt(pos) & 0xFF) << ((pos % 4) * 8));
+          pos++;
+        }
+        wc = (pos >>> 2);
+        wa[wc] = (wa[wc] || 0) | (0x80 << ((pos % 4) * 8));
+        wa[nw - 2] = len * 8;
+        return wa;
+      }
+      function wordToHex(val) {
+        let result = '', temp, byte;
+        for (let c = 0; c <= 3; c++) {
+          byte = (val >>> (c * 8)) & 255;
+          temp = byte.toString(16);
+          result += (temp.length === 1 ? '0' + temp : temp);
+        }
+        return result;
+      }
+
+      // Encode to UTF-8
+      const utf8str = unescape(encodeURIComponent(string));
+      const x = convertToWordArray(utf8str);
+      let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
+      const S11=7,S12=12,S13=17,S14=22,S21=5,S22=9,S23=14,S24=20,S31=4,S32=11,S33=16,S34=23,S41=6,S42=10,S43=15,S44=21;
+
+      for (let k = 0; k < x.length; k += 16) {
+        const AA=a,BB=b,CC=c,DD=d;
+        a=FF(a,b,c,d,x[k+0],S11,0xD76AA478);d=FF(d,a,b,c,x[k+1],S12,0xE8C7B756);c=FF(c,d,a,b,x[k+2],S13,0x242070DB);b=FF(b,c,d,a,x[k+3],S14,0xC1BDCEEE);
+        a=FF(a,b,c,d,x[k+4],S11,0xF57C0FAF);d=FF(d,a,b,c,x[k+5],S12,0x4787C62A);c=FF(c,d,a,b,x[k+6],S13,0xA8304613);b=FF(b,c,d,a,x[k+7],S14,0xFD469501);
+        a=FF(a,b,c,d,x[k+8],S11,0x698098D8);d=FF(d,a,b,c,x[k+9],S12,0x8B44F7AF);c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
+        a=FF(a,b,c,d,x[k+12],S11,0x6B901122);d=FF(d,a,b,c,x[k+13],S12,0xFD987193);c=FF(c,d,a,b,x[k+14],S13,0xA679438E);b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
+        a=GG(a,b,c,d,x[k+1],S21,0xF61E2562);d=GG(d,a,b,c,x[k+6],S22,0xC040B340);c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);b=GG(b,c,d,a,x[k+0],S24,0xE9B6C7AA);
+        a=GG(a,b,c,d,x[k+5],S21,0xD62F105D);d=GG(d,a,b,c,x[k+10],S22,0x2441453);c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);b=GG(b,c,d,a,x[k+4],S24,0xE7D3FBC8);
+        a=GG(a,b,c,d,x[k+9],S21,0x21E1CDE6);d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);c=GG(c,d,a,b,x[k+3],S23,0xF4D50D87);b=GG(b,c,d,a,x[k+8],S24,0x455A14ED);
+        a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);d=GG(d,a,b,c,x[k+2],S22,0xFCEFA3F8);c=GG(c,d,a,b,x[k+7],S23,0x676F02D9);b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
+        a=HH(a,b,c,d,x[k+5],S31,0xFFFA3942);d=HH(d,a,b,c,x[k+8],S32,0x8771F681);c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
+        a=HH(a,b,c,d,x[k+1],S31,0xA4BEEA44);d=HH(d,a,b,c,x[k+4],S32,0x4BDECFA9);c=HH(c,d,a,b,x[k+7],S33,0xF6BB4B60);b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
+        a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);d=HH(d,a,b,c,x[k+0],S32,0xEAA127FA);c=HH(c,d,a,b,x[k+3],S33,0xD4EF3085);b=HH(b,c,d,a,x[k+6],S34,0x4881D05);
+        a=HH(a,b,c,d,x[k+9],S31,0xD9D4D039);d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);b=HH(b,c,d,a,x[k+2],S34,0xC4AC5665);
+        a=II(a,b,c,d,x[k+0],S41,0xF4292244);d=II(d,a,b,c,x[k+7],S42,0x432AFF97);c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);b=II(b,c,d,a,x[k+5],S44,0xFC93A039);
+        a=II(a,b,c,d,x[k+12],S41,0x655B59C3);d=II(d,a,b,c,x[k+3],S42,0x8F0CCC92);c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);b=II(b,c,d,a,x[k+1],S44,0x85845DD1);
+        a=II(a,b,c,d,x[k+8],S41,0x6FA87E4F);d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);c=II(c,d,a,b,x[k+6],S43,0xA3014314);b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
+        a=II(a,b,c,d,x[k+4],S41,0xF7537E82);d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);c=II(c,d,a,b,x[k+2],S43,0x2AD7D2BB);b=II(b,c,d,a,x[k+9],S44,0xEB86D391);
+        a=addUnsigned(a,AA);b=addUnsigned(b,BB);c=addUnsigned(c,CC);d=addUnsigned(d,DD);
+      }
+      return wordToHex(a)+wordToHex(b)+wordToHex(c)+wordToHex(d);
+    }
+
+    async function sha(algo, text) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const hashBuffer = await crypto.subtle.digest(algo, data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function computeAll() {
+      const text = inputEl.value;
+      document.getElementById('input-stats').textContent = text.length + ' characters';
+
+      const isUpper = document.querySelector('input[name="case"]:checked').value === 'upper';
+
+      // MD5 (synchronous)
+      const md5Hash = text.length === 0 ? '—' : md5(text);
+      hashes.md5 = md5Hash === '—' ? '' : md5Hash;
+      document.getElementById('hash-md5').textContent = isUpper && md5Hash !== '—' ? md5Hash.toUpperCase() : md5Hash;
+
+      if (text.length === 0) {
+        document.getElementById('hash-sha1').textContent = '—';
+        document.getElementById('hash-sha256').textContent = '—';
+        document.getElementById('hash-sha512').textContent = '—';
+        hashes.sha1 = hashes.sha256 = hashes.sha512 = '';
+        return;
+      }
+
+      // SHA hashes (async via Web Crypto)
+      const [sha1, sha256, sha512] = await Promise.all([
+        sha('SHA-1', text),
+        sha('SHA-256', text),
+        sha('SHA-512', text),
+      ]);
+
+      hashes.sha1 = sha1;
+      hashes.sha256 = sha256;
+      hashes.sha512 = sha512;
+
+      document.getElementById('hash-sha1').textContent = isUpper ? sha1.toUpperCase() : sha1;
+      document.getElementById('hash-sha256').textContent = isUpper ? sha256.toUpperCase() : sha256;
+      document.getElementById('hash-sha512').textContent = isUpper ? sha512.toUpperCase() : sha512;
+    }
+
+    function copyHash(type) {
+      const hash = hashes[type];
+      if (!hash) return;
+      const isUpper = document.querySelector('input[name="case"]:checked').value === 'upper';
+      const text = isUpper ? hash.toUpperCase() : hash;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector(`[data-copy="${type}"]`);
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function compareHash() {
+      const expected = document.getElementById('compare-input').value.trim().toLowerCase();
+      const resultEl = document.getElementById('compare-result');
+      if (!expected) {
+        resultEl.classList.add('hidden');
+        return;
+      }
+      resultEl.classList.remove('hidden');
+
+      const matches = [];
+      if (hashes.md5 && hashes.md5 === expected) matches.push('MD5');
+      if (hashes.sha1 && hashes.sha1 === expected) matches.push('SHA-1');
+      if (hashes.sha256 && hashes.sha256 === expected) matches.push('SHA-256');
+      if (hashes.sha512 && hashes.sha512 === expected) matches.push('SHA-512');
+
+      if (matches.length > 0) {
+        resultEl.innerHTML = '<span class="text-green-700 font-medium">&#10003; Match found: ' + matches.join(', ') + '</span>';
+      } else {
+        resultEl.innerHTML = '<span class="text-red-600 font-medium">&#10007; No match found</span>';
+      }
+    }
+
+    // Event listeners
+    inputEl.addEventListener('input', computeAll);
+    document.querySelectorAll('input[name="case"]').forEach(r => r.addEventListener('change', computeAll));
+    document.getElementById('compare-input').addEventListener('input', compareHash);
+
+    // Init
+    computeAll();
+  </script>
+</body>
+</html>

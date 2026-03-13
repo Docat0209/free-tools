@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free UUID Generator — v4, v7, Bulk Generate Online | FreeTools</title>
+  <meta name="description" content="Generate UUID v4 and v7 instantly in your browser. Bulk generate up to 100 UUIDs. Copy with one click. No signup, no data collection — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .uuid-display { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 16px; letter-spacing: 0.5px; }
+    .uuid-item { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">UUID Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">UUID Generator</h1>
+
+    <!-- Main UUID display -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center gap-3">
+        <div id="uuid-display" class="uuid-display flex-1 text-gray-900 select-all" aria-live="polite"></div>
+        <button onclick="copyUuid()" id="copy-btn" class="flex-shrink-0 bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Copy</button>
+        <button onclick="generateOne()" class="flex-shrink-0 bg-gray-100 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">&#8635;</button>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="mb-4">
+        <label class="text-sm font-medium text-gray-700 block mb-2">Version</label>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="version" value="v4" checked class="text-blue-600 focus:ring-blue-400">
+            <span class="text-sm text-gray-700">UUID v4 (random)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="version" value="v7" class="text-blue-600 focus:ring-blue-400">
+            <span class="text-sm text-gray-700">UUID v7 (time-ordered)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-upper" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Uppercase</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-braces" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">With braces {}</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-no-hyphens" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">No hyphens</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mb-6">
+      <button onclick="generateOne()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Generate UUID</button>
+      <button onclick="generateBulk()" class="flex-1 bg-gray-100 text-gray-700 px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">Generate Bulk</button>
+    </div>
+
+    <!-- Bulk controls -->
+    <div id="bulk-controls" class="hidden bg-white border rounded-lg p-5 mb-3">
+      <div class="flex items-center gap-3">
+        <label for="bulk-count" class="text-sm font-medium text-gray-700">Count:</label>
+        <input type="number" id="bulk-count" min="2" max="100" value="10" class="w-20 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+        <button onclick="generateBulk()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">Generate</button>
+        <button onclick="copyBulk()" class="text-sm text-blue-600 hover:text-blue-800 font-medium ml-auto">Copy all</button>
+      </div>
+    </div>
+
+    <!-- Bulk list -->
+    <div id="bulk-section" class="hidden bg-white border rounded-lg p-5 mb-6">
+      <div id="bulk-list" class="space-y-1 max-h-96 overflow-y-auto"></div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This UUID Generator</h2>
+      <p>Generate universally unique identifiers (UUIDs) instantly in your browser. UUIDs are 128-bit identifiers that are guaranteed to be unique across all space and time.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">UUID Versions</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>UUID v4</strong> — Randomly generated. The most common version. 122 bits of randomness provide virtually zero collision probability.</li>
+        <li><strong>UUID v7</strong> — Time-ordered (RFC 9562). Embeds a Unix timestamp in the first 48 bits, making UUIDs naturally sortable by creation time. Ideal for database primary keys.</li>
+      </ul>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Cryptographically Secure</strong> — Uses <code>crypto.getRandomValues()</code></li>
+        <li><strong>Bulk Generation</strong> — Generate up to 100 UUIDs at once</li>
+        <li><strong>Format Options</strong> — Uppercase, braces, no hyphens</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    function generateUuidV4() {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+      bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 1
+      return formatBytes(bytes);
+    }
+
+    function generateUuidV7() {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+
+      // Timestamp (48 bits = milliseconds since Unix epoch)
+      const now = Date.now();
+      bytes[0] = (now / 2**40) & 0xff;
+      bytes[1] = (now / 2**32) & 0xff;
+      bytes[2] = (now / 2**24) & 0xff;
+      bytes[3] = (now / 2**16) & 0xff;
+      bytes[4] = (now / 2**8) & 0xff;
+      bytes[5] = now & 0xff;
+
+      bytes[6] = (bytes[6] & 0x0f) | 0x70; // version 7
+      bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 1
+      return formatBytes(bytes);
+    }
+
+    function formatBytes(bytes) {
+      const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+      return hex.slice(0,8) + '-' + hex.slice(8,12) + '-' + hex.slice(12,16) + '-' + hex.slice(16,20) + '-' + hex.slice(20);
+    }
+
+    function getVersion() {
+      return document.querySelector('input[name="version"]:checked').value;
+    }
+
+    function generateRaw() {
+      return getVersion() === 'v7' ? generateUuidV7() : generateUuidV4();
+    }
+
+    function formatUuid(uuid) {
+      let result = uuid;
+      if (document.getElementById('opt-no-hyphens').checked) {
+        result = result.replace(/-/g, '');
+      }
+      if (document.getElementById('opt-upper').checked) {
+        result = result.toUpperCase();
+      }
+      if (document.getElementById('opt-braces').checked) {
+        result = '{' + result + '}';
+      }
+      return result;
+    }
+
+    function generateOne() {
+      const uuid = formatUuid(generateRaw());
+      document.getElementById('uuid-display').textContent = uuid;
+    }
+
+    function copyUuid() {
+      const text = document.getElementById('uuid-display').textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('bg-green-600');
+        btn.classList.remove('bg-blue-600');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('bg-green-600');
+          btn.classList.add('bg-blue-600');
+        }, 1500);
+      });
+    }
+
+    function generateBulk() {
+      const count = Math.max(2, Math.min(100, parseInt(document.getElementById('bulk-count').value, 10) || 10));
+      document.getElementById('bulk-controls').classList.remove('hidden');
+      const section = document.getElementById('bulk-section');
+      const list = document.getElementById('bulk-list');
+      section.classList.remove('hidden');
+      list.innerHTML = '';
+
+      for (let i = 0; i < count; i++) {
+        const uuid = formatUuid(generateRaw());
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 bg-gray-50 rounded';
+        row.innerHTML = `
+          <span class="uuid-item flex-1 select-all text-gray-800">${uuid}</span>
+          <button onclick="copySingle(this)" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex-shrink-0">Copy</button>
+        `;
+        list.appendChild(row);
+      }
+    }
+
+    function copySingle(btn) {
+      const text = btn.previousElementSibling.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function copyBulk() {
+      const items = document.querySelectorAll('#bulk-list .uuid-item');
+      const text = Array.from(items).map(el => el.textContent).join('\n');
+      navigator.clipboard.writeText(text);
+    }
+
+    // Re-generate on option change
+    document.querySelectorAll('input[name="version"], #opt-upper, #opt-braces, #opt-no-hyphens').forEach(el => {
+      el.addEventListener('change', generateOne);
+    });
+
+    // Generate on load
+    generateOne();
+  </script>
+</body>
+</html>
