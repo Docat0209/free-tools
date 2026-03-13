@@ -28,7 +28,7 @@
     #preview th { background: #f9fafb; font-weight: 600; }
     #preview img { max-width: 100%; border-radius: 4px; }
     #preview hr { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
-    .pane { height: calc(100vh - 140px); }
+    .pane { height: calc(100vh - 140px - 32px); }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -47,7 +47,7 @@
     </div>
   </nav>
 
-  <div class="grid grid-cols-2 divide-x" style="height: calc(100vh - 57px);">
+  <div class="grid grid-cols-2 divide-x" style="height: calc(100vh - 57px - 32px);">
     <div class="flex flex-col">
       <div class="px-4 py-2 bg-gray-100 text-xs font-medium text-gray-500 border-b flex justify-between">
         <span>Markdown</span>
@@ -60,6 +60,12 @@
       <div id="preview" class="pane w-full p-6 overflow-auto bg-white"></div>
     </div>
   </div>
+
+  <footer class="h-8 flex items-center justify-center gap-4 text-xs text-gray-400 border-t bg-gray-50">
+    <span>Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-500 hover:underline">mcp-openapi</a> & <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-500 hover:underline">graphql-to-mcp</a></span>
+    <span class="text-gray-300">|</span>
+    <a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="hover:text-yellow-600 transition">&#9749; Buy me a coffee</a>
+  </footer>
 
   <script>
     const editor = document.getElementById('editor');
