@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free JSON to YAML Converter — Convert Online | FreeTools</title>
+  <meta name="description" content="Convert JSON to YAML and YAML to JSON instantly in your browser. Validate, format, and convert between formats. No signup — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">JSON ↔ YAML</span>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">JSON ↔ YAML Converter</h1>
+
+    <!-- Error -->
+    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg px-4 py-2 mb-4 text-sm text-red-700"></div>
+
+    <div class="grid lg:grid-cols-2 gap-4 mb-4">
+      <!-- JSON side -->
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium text-gray-700">JSON</label>
+          <div class="flex gap-2">
+            <button onclick="formatJson()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Format</button>
+            <button onclick="copyField('json-input')" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy</button>
+            <button onclick="document.getElementById('json-input').value='';" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+          </div>
+        </div>
+        <textarea id="json-input" rows="18" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder='{"key": "value"}'></textarea>
+      </div>
+
+      <!-- YAML side -->
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium text-gray-700">YAML</label>
+          <div class="flex gap-2">
+            <button onclick="copyField('yaml-input')" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy</button>
+            <button onclick="document.getElementById('yaml-input').value='';" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+          </div>
+        </div>
+        <textarea id="yaml-input" rows="18" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="key: value"></textarea>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-center gap-4 mb-6">
+      <button onclick="jsonToYaml()" class="bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">JSON → YAML</button>
+      <button onclick="yamlToJson()" class="bg-gray-700 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400">YAML → JSON</button>
+    </div>
+
+    <!-- Options -->
+    <div class="bg-white border rounded-lg p-4 mb-6">
+      <div class="flex items-center gap-4">
+        <label class="text-sm text-gray-700">JSON indent:</label>
+        <select id="json-indent" class="border rounded px-2 py-1 text-sm">
+          <option value="2" selected>2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tab</option>
+        </select>
+        <label class="text-sm text-gray-700 ml-4">YAML indent:</label>
+        <select id="yaml-indent" class="border rounded px-2 py-1 text-sm">
+          <option value="2" selected>2 spaces</option>
+          <option value="4">4 spaces</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This JSON/YAML Converter</h2>
+      <p>Convert between JSON and YAML formats instantly. Both formats are widely used for configuration files, APIs, and data serialization. This tool handles nested objects, arrays, and all standard data types.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Bidirectional</strong> — Convert JSON → YAML and YAML → JSON</li>
+        <li><strong>Configurable Indent</strong> — 2 spaces, 4 spaces, or tabs</li>
+        <li><strong>Validation</strong> — Instant error feedback for invalid input</li>
+        <li><strong>Full Data Types</strong> — Strings, numbers, booleans, null, arrays, objects</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const errorEl = document.getElementById('error');
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+    function clearError() {
+      errorEl.classList.add('hidden');
+    }
+
+    function getJsonIndent() {
+      const v = document.getElementById('json-indent').value;
+      return v === 'tab' ? '\t' : parseInt(v, 10);
+    }
+
+    function getYamlIndent() {
+      return parseInt(document.getElementById('yaml-indent').value, 10);
+    }
+
+    // JSON to YAML converter
+    function toYaml(obj, indent, level) {
+      if (obj === null) return 'null';
+      if (obj === undefined) return 'null';
+
+      const type = typeof obj;
+      if (type === 'boolean') return obj.toString();
+      if (type === 'number') return obj.toString();
+      if (type === 'string') {
+        // Check if string needs quoting
+        if (obj === '' || obj === 'true' || obj === 'false' || obj === 'null' ||
+            obj === 'yes' || obj === 'no' || obj === 'on' || obj === 'off' ||
+            /^[0-9]/.test(obj) || /[:#\[\]{}&*!|>'"%@`]/.test(obj) ||
+            obj.includes('\n') || obj.trim() !== obj) {
+          return JSON.stringify(obj);
+        }
+        return obj;
+      }
+
+      const pad = ' '.repeat(indent * level);
+      const childPad = ' '.repeat(indent * (level + 1));
+
+      if (Array.isArray(obj)) {
+        if (obj.length === 0) return '[]';
+        const items = obj.map(item => {
+          if (item !== null && typeof item === 'object') {
+            const inner = toYaml(item, indent, level + 1);
+            if (Array.isArray(item)) {
+              return pad + '- ' + inner.trim();
+            }
+            // Object: first key on same line as dash
+            const lines = inner.split('\n');
+            return pad + '- ' + lines[0].trim() + (lines.length > 1 ? '\n' + lines.slice(1).map(l => pad + '  ' + l.trimStart()).join('\n') : '');
+          }
+          return pad + '- ' + toYaml(item, indent, level + 1);
+        });
+        return items.join('\n');
+      }
+
+      if (type === 'object') {
+        const keys = Object.keys(obj);
+        if (keys.length === 0) return '{}';
+        const lines = keys.map(key => {
+          const val = obj[key];
+          const yamlKey = /[:#\[\]{}&*!|>'"%@`,\s]/.test(key) || key === '' ? JSON.stringify(key) : key;
+          if (val !== null && typeof val === 'object') {
+            const inner = toYaml(val, indent, level + 1);
+            if ((Array.isArray(val) && val.length > 0) || (!Array.isArray(val) && Object.keys(val).length > 0)) {
+              return pad + yamlKey + ':\n' + inner;
+            }
+            return pad + yamlKey + ': ' + inner;
+          }
+          return pad + yamlKey + ': ' + toYaml(val, indent, level + 1);
+        });
+        return lines.join('\n');
+      }
+
+      return String(obj);
+    }
+
+    // Simple YAML parser (handles common cases)
+    function parseYaml(str) {
+      const lines = str.split('\n');
+      return parseYamlLines(lines, 0, 0).value;
+    }
+
+    function parseYamlLines(lines, start, baseIndent) {
+      // Detect if this is an array or object
+      let i = start;
+      while (i < lines.length && (lines[i].trim() === '' || lines[i].trim().startsWith('#'))) i++;
+      if (i >= lines.length) return {value: null, end: i};
+
+      const firstLine = lines[i];
+      const firstTrimmed = firstLine.trim();
+
+      // Empty
+      if (firstTrimmed === '') return {value: null, end: i};
+
+      // Inline values
+      if (firstTrimmed === '{}') return {value: {}, end: i + 1};
+      if (firstTrimmed === '[]') return {value: [], end: i + 1};
+
+      // Detect array vs object
+      if (firstTrimmed.startsWith('- ') || firstTrimmed === '-') {
+        return parseYamlArray(lines, i, getIndent(firstLine));
+      }
+      if (firstTrimmed.includes(':')) {
+        return parseYamlObject(lines, i, getIndent(firstLine));
+      }
+
+      return {value: parseScalar(firstTrimmed), end: i + 1};
+    }
+
+    function getIndent(line) {
+      return line.length - line.trimStart().length;
+    }
+
+    function parseScalar(s) {
+      s = s.trim();
+      if (s === 'null' || s === '~') return null;
+      if (s === 'true' || s === 'yes' || s === 'on') return true;
+      if (s === 'false' || s === 'no' || s === 'off') return false;
+      if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+      if (/^-?\d+\.\d+$/.test(s)) return parseFloat(s);
+      if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+        return s.slice(1, -1);
+      }
+      return s;
+    }
+
+    function parseYamlObject(lines, start, baseIndent) {
+      const obj = {};
+      let i = start;
+
+      while (i < lines.length) {
+        const line = lines[i];
+        if (line.trim() === '' || line.trim().startsWith('#')) { i++; continue; }
+
+        const indent = getIndent(line);
+        if (indent < baseIndent) break;
+        if (indent > baseIndent) break; // shouldn't happen at this level
+
+        const trimmed = line.trim();
+        const colonIdx = trimmed.indexOf(':');
+        if (colonIdx === -1) break;
+
+        let key = trimmed.slice(0, colonIdx).trim();
+        if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+          key = key.slice(1, -1);
+        }
+
+        const afterColon = trimmed.slice(colonIdx + 1).trim();
+
+        if (afterColon === '' || afterColon === '|' || afterColon === '>') {
+          // Value is on next lines (block)
+          i++;
+          if (i < lines.length) {
+            const nextLine = lines[i];
+            if (nextLine.trim() !== '' && getIndent(nextLine) > baseIndent) {
+              const result = parseYamlLines(lines, i, getIndent(nextLine));
+              obj[key] = result.value;
+              i = result.end;
+            } else {
+              obj[key] = null;
+            }
+          } else {
+            obj[key] = null;
+          }
+        } else {
+          obj[key] = parseScalar(afterColon);
+          i++;
+        }
+      }
+
+      return {value: obj, end: i};
+    }
+
+    function parseYamlArray(lines, start, baseIndent) {
+      const arr = [];
+      let i = start;
+
+      while (i < lines.length) {
+        const line = lines[i];
+        if (line.trim() === '' || line.trim().startsWith('#')) { i++; continue; }
+
+        const indent = getIndent(line);
+        if (indent < baseIndent) break;
+        if (indent > baseIndent) break;
+
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('- ') && trimmed !== '-') break;
+
+        const afterDash = trimmed.slice(2).trim();
+
+        if (afterDash === '' || trimmed === '-') {
+          i++;
+          if (i < lines.length && getIndent(lines[i]) > baseIndent) {
+            const result = parseYamlLines(lines, i, getIndent(lines[i]));
+            arr.push(result.value);
+            i = result.end;
+          } else {
+            arr.push(null);
+          }
+        } else if (afterDash.includes(':')) {
+          // Inline object start
+          const colonIdx = afterDash.indexOf(':');
+          const key = afterDash.slice(0, colonIdx).trim();
+          const val = afterDash.slice(colonIdx + 1).trim();
+
+          const obj = {};
+          if (val === '') {
+            i++;
+            if (i < lines.length && getIndent(lines[i]) > baseIndent) {
+              const result = parseYamlLines(lines, i, getIndent(lines[i]));
+              obj[key] = result.value;
+              i = result.end;
+            } else {
+              obj[key] = null;
+              i++;
+            }
+          } else {
+            obj[key] = parseScalar(val);
+            i++;
+          }
+
+          // Check for more keys at this indent + 2
+          while (i < lines.length) {
+            const nextLine = lines[i];
+            if (nextLine.trim() === '') { i++; continue; }
+            const nextIndent = getIndent(nextLine);
+            if (nextIndent <= baseIndent) break;
+            if (nextIndent === baseIndent + 2) {
+              const nt = nextLine.trim();
+              const nc = nt.indexOf(':');
+              if (nc > 0) {
+                const nk = nt.slice(0, nc).trim();
+                const nv = nt.slice(nc + 1).trim();
+                if (nv === '') {
+                  i++;
+                  if (i < lines.length && getIndent(lines[i]) > nextIndent) {
+                    const result = parseYamlLines(lines, i, getIndent(lines[i]));
+                    obj[nk] = result.value;
+                    i = result.end;
+                  } else {
+                    obj[nk] = null;
+                  }
+                } else {
+                  obj[nk] = parseScalar(nv);
+                  i++;
+                }
+              } else {
+                break;
+              }
+            } else {
+              break;
+            }
+          }
+          arr.push(obj);
+        } else {
+          arr.push(parseScalar(afterDash));
+          i++;
+        }
+      }
+
+      return {value: arr, end: i};
+    }
+
+    function jsonToYaml() {
+      clearError();
+      const jsonStr = document.getElementById('json-input').value.trim();
+      if (!jsonStr) return;
+
+      try {
+        const obj = JSON.parse(jsonStr);
+        const yaml = toYaml(obj, getYamlIndent(), 0);
+        document.getElementById('yaml-input').value = yaml;
+      } catch (e) {
+        showError('Invalid JSON: ' + e.message);
+      }
+    }
+
+    function yamlToJson() {
+      clearError();
+      const yamlStr = document.getElementById('yaml-input').value.trim();
+      if (!yamlStr) return;
+
+      try {
+        const obj = parseYaml(yamlStr);
+        const indent = getJsonIndent();
+        document.getElementById('json-input').value = JSON.stringify(obj, null, indent);
+      } catch (e) {
+        showError('YAML parse error: ' + e.message);
+      }
+    }
+
+    function formatJson() {
+      clearError();
+      const jsonStr = document.getElementById('json-input').value.trim();
+      if (!jsonStr) return;
+      try {
+        const obj = JSON.parse(jsonStr);
+        document.getElementById('json-input').value = JSON.stringify(obj, null, getJsonIndent());
+      } catch (e) {
+        showError('Invalid JSON: ' + e.message);
+      }
+    }
+
+    function copyField(id) {
+      const text = document.getElementById(id).value;
+      if (text) navigator.clipboard.writeText(text);
+    }
+  </script>
+</body>
+</html>

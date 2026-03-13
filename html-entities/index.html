@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free HTML Entity Encoder/Decoder — Escape & Unescape HTML Online | FreeTools</title>
+  <meta name="description" content="Encode special characters to HTML entities or decode HTML entities back to text. Supports named and numeric entities. No signup — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">HTML Entity Encoder/Decoder</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">HTML Entity Encoder / Decoder</h1>
+
+    <!-- Mode -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex gap-4 mb-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="enc-mode" value="named" checked class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Named entities (<code>&amp;amp;</code>)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="enc-mode" value="decimal" class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Decimal (<code>&amp;#38;</code>)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="enc-mode" value="hex" class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Hex (<code>&amp;#x26;</code>)</span>
+        </label>
+      </div>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="opt-all" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+        <span class="text-sm text-gray-700">Encode all characters (not just special ones)</span>
+      </label>
+    </div>
+
+    <!-- Input -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-gray-700">Input</label>
+        <button onclick="document.getElementById('input').value=''; updateStats();" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+      </div>
+      <textarea id="input" rows="5" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder='<div class="hello">&amp; world</div>'></textarea>
+      <span id="input-stats" class="text-xs text-gray-400 mt-1 block">0 characters</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mb-4">
+      <button onclick="encodeEntities()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700">Encode →</button>
+      <button onclick="decodeEntities()" class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-800">← Decode</button>
+    </div>
+
+    <!-- Output -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-gray-700">Output</label>
+        <button onclick="copyOutput()" id="copy-btn" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy</button>
+      </div>
+      <textarea id="output" rows="5" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y bg-gray-50" readonly></textarea>
+      <div class="flex items-center justify-between mt-1">
+        <span id="output-stats" class="text-xs text-gray-400">0 characters</span>
+        <button onclick="useAsInput()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Use as input ↑</button>
+      </div>
+    </div>
+
+    <!-- Common entities reference -->
+    <details class="bg-white border rounded-lg p-5 mb-6">
+      <summary class="text-sm font-medium text-gray-700 cursor-pointer">Common HTML Entities Reference</summary>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 text-xs mono">
+        <div><code>&amp;amp;</code> → &amp;</div>
+        <div><code>&amp;lt;</code> → &lt;</div>
+        <div><code>&amp;gt;</code> → &gt;</div>
+        <div><code>&amp;quot;</code> → "</div>
+        <div><code>&amp;apos;</code> → '</div>
+        <div><code>&amp;nbsp;</code> → (space)</div>
+        <div><code>&amp;copy;</code> → ©</div>
+        <div><code>&amp;reg;</code> → ®</div>
+        <div><code>&amp;trade;</code> → ™</div>
+        <div><code>&amp;euro;</code> → €</div>
+        <div><code>&amp;pound;</code> → £</div>
+        <div><code>&amp;yen;</code> → ¥</div>
+        <div><code>&amp;mdash;</code> → —</div>
+        <div><code>&amp;ndash;</code> → –</div>
+        <div><code>&amp;laquo;</code> → «</div>
+        <div><code>&amp;raquo;</code> → »</div>
+      </div>
+    </details>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This HTML Entity Encoder/Decoder</h2>
+      <p>Encode special characters to their HTML entity equivalents, or decode HTML entities back to readable text. Essential for safely embedding content in HTML and preventing XSS vulnerabilities.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Three Encoding Modes</strong> — Named entities, decimal, or hexadecimal</li>
+        <li><strong>Full Encode Option</strong> — Encode all characters, not just special ones</li>
+        <li><strong>Auto-Decode</strong> — Handles named, decimal, and hex entities automatically</li>
+        <li><strong>Reference Table</strong> — Quick lookup for common HTML entities</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+
+    const NAMED_ENTITIES = {
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+      '©': '&copy;', '®': '&reg;', '™': '&trade;', '€': '&euro;',
+      '£': '&pound;', '¥': '&yen;', '¢': '&cent;', '§': '&sect;',
+      '°': '&deg;', '±': '&plusmn;', '×': '&times;', '÷': '&divide;',
+      '—': '&mdash;', '–': '&ndash;', '…': '&hellip;',
+      '«': '&laquo;', '»': '&raquo;',
+      ' ': '&nbsp;'
+    };
+
+    function getMode() {
+      return document.querySelector('input[name="enc-mode"]:checked').value;
+    }
+
+    function updateStats() {
+      document.getElementById('input-stats').textContent = inputEl.value.length + ' characters';
+    }
+    inputEl.addEventListener('input', updateStats);
+
+    function encodeEntities() {
+      const text = inputEl.value;
+      const mode = getMode();
+      const encodeAll = document.getElementById('opt-all').checked;
+
+      let result = '';
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const code = char.codePointAt(0);
+
+        if (!encodeAll) {
+          // Only encode special HTML characters
+          if (mode === 'named' && NAMED_ENTITIES[char] && char !== ' ' && char !== '\u00A0') {
+            result += NAMED_ENTITIES[char];
+          } else if (char === '&' || char === '<' || char === '>' || char === '"' || char === "'") {
+            if (mode === 'decimal') {
+              result += '&#' + code + ';';
+            } else if (mode === 'hex') {
+              result += '&#x' + code.toString(16) + ';';
+            } else {
+              result += NAMED_ENTITIES[char] || char;
+            }
+          } else {
+            result += char;
+          }
+        } else {
+          // Encode everything
+          if (mode === 'named' && NAMED_ENTITIES[char]) {
+            result += NAMED_ENTITIES[char];
+          } else if (mode === 'decimal') {
+            result += '&#' + code + ';';
+          } else if (mode === 'hex') {
+            result += '&#x' + code.toString(16) + ';';
+          } else {
+            // Named but no named entity exists
+            if (code > 127 || char === '&' || char === '<' || char === '>' || char === '"' || char === "'") {
+              result += '&#' + code + ';';
+            } else {
+              result += char;
+            }
+          }
+        }
+      }
+
+      outputEl.value = result;
+      document.getElementById('output-stats').textContent = result.length + ' characters';
+    }
+
+    function decodeEntities() {
+      const text = inputEl.value;
+      // Use browser's built-in HTML parser
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+      const result = doc.documentElement.textContent;
+      outputEl.value = result;
+      document.getElementById('output-stats').textContent = result.length + ' characters';
+    }
+
+    function copyOutput() {
+      const text = outputEl.value;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function useAsInput() {
+      inputEl.value = outputEl.value;
+      updateStats();
+    }
+  </script>
+</body>
+</html>
