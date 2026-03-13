@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Unix Timestamp Converter — Epoch to Date Online | FreeTools</title>
+  <meta name="description" content="Convert Unix timestamps to human-readable dates and vice versa. Current epoch time, milliseconds support, multiple timezone display. No signup — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+    .live-pulse { animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Timestamp Converter</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Unix Timestamp Converter</h1>
+
+    <!-- Current time -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-gray-700">Current Unix Timestamp</span>
+        <span class="live-pulse text-xs text-green-600 font-medium">LIVE</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="live-timestamp" class="mono text-2xl font-bold text-gray-900"></span>
+        <button onclick="copyText(document.getElementById('live-timestamp').textContent)" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy</button>
+      </div>
+      <div id="live-date" class="mono text-sm text-gray-500 mt-1"></div>
+    </div>
+
+    <!-- Timestamp to Date -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <h2 class="text-sm font-medium text-gray-700 mb-3">Timestamp → Date</h2>
+      <div class="flex gap-3 mb-4">
+        <input type="text" id="ts-input" class="flex-1 mono text-sm border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Enter Unix timestamp (e.g. 1710345600)">
+        <select id="ts-unit" class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+          <option value="s">Seconds</option>
+          <option value="ms">Milliseconds</option>
+        </select>
+        <button onclick="convertTimestamp()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">Convert</button>
+      </div>
+      <div id="ts-result" class="hidden">
+        <table class="w-full text-sm">
+          <tbody id="ts-result-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Date to Timestamp -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <h2 class="text-sm font-medium text-gray-700 mb-3">Date → Timestamp</h2>
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-3">
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Year</label>
+          <input type="number" id="d-year" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="2026">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Month</label>
+          <input type="number" id="d-month" min="1" max="12" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="3">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Day</label>
+          <input type="number" id="d-day" min="1" max="31" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="13">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Hour</label>
+          <input type="number" id="d-hour" min="0" max="23" value="0" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Min</label>
+          <input type="number" id="d-min" min="0" max="59" value="0" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500 block mb-1">Sec</label>
+          <input type="number" id="d-sec" min="0" max="59" value="0" class="w-full border rounded px-2 py-2 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+      </div>
+      <div class="flex gap-3 mb-3">
+        <button onclick="useNow()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Use current time</button>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="convertDate()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">Convert</button>
+      </div>
+      <div id="date-result" class="hidden mt-4">
+        <table class="w-full text-sm">
+          <tbody id="date-result-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Relative time -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <h2 class="text-sm font-medium text-gray-700 mb-3">Common Timestamps</h2>
+      <div class="grid grid-cols-2 gap-2 text-sm" id="common-timestamps"></div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Timestamp Converter</h2>
+      <p>Convert between Unix timestamps (epoch time) and human-readable dates. A Unix timestamp represents the number of seconds since January 1, 1970 00:00:00 UTC (the Unix epoch).</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Live Clock</strong> — Real-time current Unix timestamp</li>
+        <li><strong>Bidirectional</strong> — Convert timestamp → date and date → timestamp</li>
+        <li><strong>Milliseconds</strong> — Support for both seconds and milliseconds</li>
+        <li><strong>Multiple Formats</strong> — UTC, ISO 8601, local time, relative time</li>
+        <li><strong>Common Timestamps</strong> — Quick reference for relative times</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    // Live timestamp
+    function updateLive() {
+      const now = Math.floor(Date.now() / 1000);
+      document.getElementById('live-timestamp').textContent = now;
+      document.getElementById('live-date').textContent = new Date().toISOString();
+    }
+    updateLive();
+    setInterval(updateLive, 1000);
+
+    // Copy helper
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // brief visual feedback handled by caller if needed
+      });
+    }
+
+    // Timestamp → Date
+    function convertTimestamp() {
+      const input = document.getElementById('ts-input').value.trim();
+      const unit = document.getElementById('ts-unit').value;
+      const resultEl = document.getElementById('ts-result');
+      const bodyEl = document.getElementById('ts-result-body');
+
+      if (!input) return;
+
+      let ts = parseInt(input, 10);
+      if (isNaN(ts)) return;
+
+      let ms = unit === 'ms' ? ts : ts * 1000;
+      const date = new Date(ms);
+
+      if (isNaN(date.getTime())) {
+        bodyEl.innerHTML = '<tr><td class="text-red-600">Invalid timestamp</td></tr>';
+        resultEl.classList.remove('hidden');
+        return;
+      }
+
+      const rows = [
+        ['UTC', date.toUTCString()],
+        ['ISO 8601', date.toISOString()],
+        ['Local Time', date.toLocaleString()],
+        ['Timestamp (s)', Math.floor(ms / 1000).toString()],
+        ['Timestamp (ms)', ms.toString()],
+        ['Relative', relativeTime(date)],
+        ['Day of Week', date.toLocaleDateString('en-US', { weekday: 'long' })],
+        ['Day of Year', dayOfYear(date).toString()],
+        ['Week Number', weekNumber(date).toString()],
+      ];
+
+      bodyEl.innerHTML = rows.map(([label, value]) =>
+        '<tr class="border-b last:border-0"><td class="py-2 pr-4 text-gray-500 font-medium whitespace-nowrap">' + label + '</td><td class="py-2 mono text-gray-800">' + escapeHtml(value) + ' <button onclick="copyText(\'' + escapeAttr(value) + '\')" class="text-xs text-blue-600 hover:text-blue-800 ml-2">copy</button></td></tr>'
+      ).join('');
+
+      resultEl.classList.remove('hidden');
+    }
+
+    // Date → Timestamp
+    function convertDate() {
+      const y = parseInt(document.getElementById('d-year').value, 10);
+      const mo = parseInt(document.getElementById('d-month').value, 10);
+      const d = parseInt(document.getElementById('d-day').value, 10);
+      const h = parseInt(document.getElementById('d-hour').value, 10) || 0;
+      const mi = parseInt(document.getElementById('d-min').value, 10) || 0;
+      const s = parseInt(document.getElementById('d-sec').value, 10) || 0;
+
+      if (isNaN(y) || isNaN(mo) || isNaN(d)) return;
+
+      const date = new Date(Date.UTC(y, mo - 1, d, h, mi, s));
+      const ts = Math.floor(date.getTime() / 1000);
+      const tsMs = date.getTime();
+
+      const resultEl = document.getElementById('date-result');
+      const bodyEl = document.getElementById('date-result-body');
+
+      const rows = [
+        ['Timestamp (s)', ts.toString()],
+        ['Timestamp (ms)', tsMs.toString()],
+        ['ISO 8601', date.toISOString()],
+        ['UTC', date.toUTCString()],
+        ['Relative', relativeTime(date)],
+      ];
+
+      bodyEl.innerHTML = rows.map(([label, value]) =>
+        '<tr class="border-b last:border-0"><td class="py-2 pr-4 text-gray-500 font-medium whitespace-nowrap">' + label + '</td><td class="py-2 mono text-gray-800">' + escapeHtml(value) + ' <button onclick="copyText(\'' + escapeAttr(value) + '\')" class="text-xs text-blue-600 hover:text-blue-800 ml-2">copy</button></td></tr>'
+      ).join('');
+
+      resultEl.classList.remove('hidden');
+    }
+
+    function useNow() {
+      const now = new Date();
+      document.getElementById('d-year').value = now.getUTCFullYear();
+      document.getElementById('d-month').value = now.getUTCMonth() + 1;
+      document.getElementById('d-day').value = now.getUTCDate();
+      document.getElementById('d-hour').value = now.getUTCHours();
+      document.getElementById('d-min').value = now.getUTCMinutes();
+      document.getElementById('d-sec').value = now.getUTCSeconds();
+    }
+
+    function relativeTime(date) {
+      const now = Date.now();
+      const diff = now - date.getTime();
+      const absDiff = Math.abs(diff);
+      const past = diff > 0;
+
+      const units = [
+        [31536000000, 'year'],
+        [2592000000, 'month'],
+        [86400000, 'day'],
+        [3600000, 'hour'],
+        [60000, 'minute'],
+        [1000, 'second'],
+      ];
+
+      for (const [ms, unit] of units) {
+        const count = Math.floor(absDiff / ms);
+        if (count >= 1) {
+          const plural = count !== 1 ? 's' : '';
+          return past ? count + ' ' + unit + plural + ' ago' : 'in ' + count + ' ' + unit + plural;
+        }
+      }
+      return 'just now';
+    }
+
+    function dayOfYear(date) {
+      const start = new Date(date.getFullYear(), 0, 0);
+      const diff = date - start;
+      return Math.floor(diff / 86400000);
+    }
+
+    function weekNumber(date) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // Common timestamps
+    function renderCommon() {
+      const now = Math.floor(Date.now() / 1000);
+      const items = [
+        ['1 hour ago', now - 3600],
+        ['1 hour from now', now + 3600],
+        ['Yesterday', now - 86400],
+        ['Tomorrow', now + 86400],
+        ['1 week ago', now - 604800],
+        ['1 week from now', now + 604800],
+        ['30 days ago', now - 2592000],
+        ['30 days from now', now + 2592000],
+        ['Start of today (UTC)', Math.floor(new Date().setUTCHours(0,0,0,0) / 1000)],
+        ['End of today (UTC)', Math.floor(new Date().setUTCHours(23,59,59,999) / 1000)],
+      ];
+
+      document.getElementById('common-timestamps').innerHTML = items.map(([label, ts]) =>
+        '<div class="flex items-center justify-between bg-gray-50 rounded px-3 py-2"><span class="text-gray-600">' + label + '</span><span class="mono text-gray-800 cursor-pointer hover:text-blue-600" onclick="document.getElementById(\'ts-input\').value=\'' + ts + '\'; convertTimestamp();">' + ts + '</span></div>'
+      ).join('');
+    }
+    renderCommon();
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escapeAttr(s) {
+      return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // Auto-convert on Enter
+    document.getElementById('ts-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') convertTimestamp();
+    });
+
+    // Auto-detect ms vs s
+    document.getElementById('ts-input').addEventListener('input', function() {
+      const val = this.value.trim();
+      if (val.length >= 13) {
+        document.getElementById('ts-unit').value = 'ms';
+      } else if (val.length <= 10) {
+        document.getElementById('ts-unit').value = 's';
+      }
+    });
+  </script>
+</body>
+</html>
