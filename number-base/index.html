@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Number Base Converter — Binary, Octal, Decimal, Hex Online | FreeTools</title>
+  <meta name="description" content="Convert numbers between binary, octal, decimal, and hexadecimal instantly. Support for arbitrary bases (2-36). No signup — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Number Base Converter</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Number Base Converter</h1>
+
+    <!-- Input -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex items-center gap-4 mb-3">
+        <div class="flex-1">
+          <label class="text-sm font-medium text-gray-700 block mb-1">Input Number</label>
+          <input type="text" id="input" class="w-full mono text-lg border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Enter a number..." value="255">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Base</label>
+          <select id="input-base" class="border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <option value="2">Binary (2)</option>
+            <option value="8">Octal (8)</option>
+            <option value="10" selected>Decimal (10)</option>
+            <option value="16">Hexadecimal (16)</option>
+            <option value="custom">Custom...</option>
+          </select>
+        </div>
+        <div id="custom-base-container" class="hidden">
+          <label class="text-sm font-medium text-gray-700 block mb-1">Custom</label>
+          <input type="number" id="custom-base" min="2" max="36" value="2" class="w-16 border rounded px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg px-4 py-2 mb-4 text-sm text-red-700"></div>
+
+    <!-- Results -->
+    <div class="space-y-3 mb-6">
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Binary (Base 2)</span>
+          <button onclick="copyResult('bin')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="bin">Copy</button>
+        </div>
+        <div id="result-bin" class="mono text-gray-800 text-lg">—</div>
+      </div>
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Octal (Base 8)</span>
+          <button onclick="copyResult('oct')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="oct">Copy</button>
+        </div>
+        <div id="result-oct" class="mono text-gray-800 text-lg">—</div>
+      </div>
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Decimal (Base 10)</span>
+          <button onclick="copyResult('dec')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="dec">Copy</button>
+        </div>
+        <div id="result-dec" class="mono text-gray-800 text-lg">—</div>
+      </div>
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Hexadecimal (Base 16)</span>
+          <button onclick="copyResult('hex')" class="text-xs text-blue-600 hover:text-blue-800 font-medium" data-copy="hex">Copy</button>
+        </div>
+        <div id="result-hex" class="mono text-gray-800 text-lg">—</div>
+      </div>
+    </div>
+
+    <!-- Bit info -->
+    <div id="bit-info" class="bg-white border rounded-lg p-4 mb-6">
+      <div class="grid grid-cols-3 gap-4 text-sm text-center">
+        <div>
+          <span class="text-gray-500 block">Bits</span>
+          <span id="info-bits" class="font-semibold text-gray-800">—</span>
+        </div>
+        <div>
+          <span class="text-gray-500 block">Bytes</span>
+          <span id="info-bytes" class="font-semibold text-gray-800">—</span>
+        </div>
+        <div>
+          <span class="text-gray-500 block">Max unsigned</span>
+          <span id="info-max" class="font-semibold text-gray-800 mono text-xs">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Number Base Converter</h2>
+      <p>Convert numbers between binary (base 2), octal (base 8), decimal (base 10), hexadecimal (base 16), and any custom base from 2 to 36. All computation happens locally in your browser.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Standard Bases</strong> — Binary, octal, decimal, hexadecimal</li>
+        <li><strong>Custom Base</strong> — Any base from 2 to 36</li>
+        <li><strong>Real-Time Conversion</strong> — Results update as you type</li>
+        <li><strong>Bit Information</strong> — Shows bit count, byte count, and max unsigned value</li>
+        <li><strong>Large Numbers</strong> — Uses BigInt for arbitrary precision</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const baseSelect = document.getElementById('input-base');
+    const customBaseInput = document.getElementById('custom-base');
+    const customContainer = document.getElementById('custom-base-container');
+    const errorEl = document.getElementById('error');
+
+    baseSelect.addEventListener('change', () => {
+      customContainer.classList.toggle('hidden', baseSelect.value !== 'custom');
+      convert();
+    });
+
+    inputEl.addEventListener('input', convert);
+    customBaseInput.addEventListener('input', convert);
+
+    function getBase() {
+      if (baseSelect.value === 'custom') {
+        return parseInt(customBaseInput.value, 10) || 10;
+      }
+      return parseInt(baseSelect.value, 10);
+    }
+
+    function convert() {
+      errorEl.classList.add('hidden');
+      const raw = inputEl.value.trim().replace(/\s/g, '');
+      if (!raw) {
+        setResults('—', '—', '—', '—');
+        setInfo('—', '—', '—');
+        return;
+      }
+
+      const base = getBase();
+      if (base < 2 || base > 36) {
+        showError('Base must be between 2 and 36');
+        return;
+      }
+
+      try {
+        // Parse using BigInt for large number support
+        let value;
+        const cleanInput = raw.toLowerCase().replace(/^0x/, '').replace(/^0b/, '').replace(/^0o/, '');
+
+        // Validate input for the given base
+        const validChars = '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, base);
+        for (const ch of cleanInput.toLowerCase()) {
+          if (!validChars.includes(ch)) {
+            showError('Invalid character "' + ch + '" for base ' + base);
+            return;
+          }
+        }
+
+        // Parse
+        if (base === 16) {
+          value = BigInt('0x' + cleanInput);
+        } else if (base === 8) {
+          value = BigInt('0o' + cleanInput);
+        } else if (base === 2) {
+          value = BigInt('0b' + cleanInput);
+        } else if (base === 10) {
+          value = BigInt(cleanInput);
+        } else {
+          // Custom base: manual conversion
+          value = 0n;
+          const bigBase = BigInt(base);
+          for (const ch of cleanInput) {
+            const digit = parseInt(ch, 36);
+            value = value * bigBase + BigInt(digit);
+          }
+        }
+
+        // Convert to all bases
+        const bin = value.toString(2);
+        const oct = value.toString(8);
+        const dec = value.toString(10);
+        const hex = value.toString(16).toUpperCase();
+
+        // Format binary with spaces every 4 bits
+        const binFormatted = bin.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+
+        setResults(binFormatted, oct, addCommas(dec), hex);
+
+        // Bit info
+        const bits = bin.length;
+        const bytes = Math.ceil(bits / 8);
+        const maxVal = ((1n << BigInt(bits)) - 1n).toString(10);
+        setInfo(bits, bytes, addCommas(maxVal));
+
+      } catch (e) {
+        showError('Invalid number: ' + e.message);
+      }
+    }
+
+    function addCommas(s) {
+      return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function setResults(bin, oct, dec, hex) {
+      document.getElementById('result-bin').textContent = bin;
+      document.getElementById('result-oct').textContent = oct;
+      document.getElementById('result-dec').textContent = dec;
+      document.getElementById('result-hex').textContent = hex;
+    }
+
+    function setInfo(bits, bytes, max) {
+      document.getElementById('info-bits').textContent = bits;
+      document.getElementById('info-bytes').textContent = bytes;
+      document.getElementById('info-max').textContent = max;
+    }
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+      setResults('—', '—', '—', '—');
+      setInfo('—', '—', '—');
+    }
+
+    function copyResult(type) {
+      const el = document.getElementById('result-' + type);
+      const text = el.textContent.replace(/[\s,]/g, '');
+      if (text === '—') return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('[data-copy="' + type + '"]');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    // Init
+    convert();
+  </script>
+</body>
+</html>

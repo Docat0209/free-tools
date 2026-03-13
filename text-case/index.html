@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Text Case Converter — camelCase, snake_case, kebab-case & More | FreeTools</title>
+  <meta name="description" content="Convert text between camelCase, PascalCase, snake_case, kebab-case, UPPER_SNAKE_CASE, Title Case, and more. Perfect for developers. 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Text Case Converter</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Text Case Converter</h1>
+
+    <!-- Input -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-gray-700">Input Text</label>
+        <button onclick="document.getElementById('input').value=''; convertAll();" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+      </div>
+      <textarea id="input" rows="3" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="Enter text, variable name, or sentence...">hello world example text</textarea>
+    </div>
+
+    <!-- Results -->
+    <div class="space-y-2 mb-6" id="results"></div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Text Case Converter</h2>
+      <p>Convert text between common naming conventions used in programming. Automatically detects word boundaries from camelCase, snake_case, kebab-case, spaces, and mixed formats.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Supported Cases</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>camelCase</strong> — JavaScript variables, Java methods</li>
+        <li><strong>PascalCase</strong> — Classes, React components, C# types</li>
+        <li><strong>snake_case</strong> — Python, Ruby, Rust variables</li>
+        <li><strong>UPPER_SNAKE_CASE</strong> — Constants in most languages</li>
+        <li><strong>kebab-case</strong> — CSS classes, URLs, file names</li>
+        <li><strong>dot.case</strong> — Java packages, object properties</li>
+        <li><strong>Title Case</strong> — Headings, titles</li>
+        <li><strong>Sentence case</strong> — Natural text</li>
+        <li><strong>UPPERCASE / lowercase</strong> — Full transforms</li>
+        <li><strong>path/case</strong> — File paths, URL segments</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const resultsEl = document.getElementById('results');
+
+    // Split text into words
+    function toWords(str) {
+      if (!str.trim()) return [];
+      return str
+        // Split on camelCase boundaries
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        // Split on consecutive uppercase followed by lowercase (e.g., XMLParser → XML Parser)
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+        // Replace separators with spaces
+        .replace(/[-_./\\]+/g, ' ')
+        // Collapse whitespace
+        .replace(/\s+/g, ' ')
+        .trim()
+        .split(' ')
+        .filter(w => w.length > 0)
+        .map(w => w.toLowerCase());
+    }
+
+    const cases = [
+      {
+        name: 'camelCase',
+        desc: 'JavaScript variables',
+        convert: words => words.map((w, i) => i === 0 ? w : w[0].toUpperCase() + w.slice(1)).join('')
+      },
+      {
+        name: 'PascalCase',
+        desc: 'Classes, components',
+        convert: words => words.map(w => w[0].toUpperCase() + w.slice(1)).join('')
+      },
+      {
+        name: 'snake_case',
+        desc: 'Python, Ruby',
+        convert: words => words.join('_')
+      },
+      {
+        name: 'UPPER_SNAKE_CASE',
+        desc: 'Constants',
+        convert: words => words.map(w => w.toUpperCase()).join('_')
+      },
+      {
+        name: 'kebab-case',
+        desc: 'CSS, URLs',
+        convert: words => words.join('-')
+      },
+      {
+        name: 'UPPER-KEBAB-CASE',
+        desc: 'HTTP headers',
+        convert: words => words.map(w => w.toUpperCase()).join('-')
+      },
+      {
+        name: 'dot.case',
+        desc: 'Java packages',
+        convert: words => words.join('.')
+      },
+      {
+        name: 'path/case',
+        desc: 'File paths',
+        convert: words => words.join('/')
+      },
+      {
+        name: 'Title Case',
+        desc: 'Headings',
+        convert: words => words.map(w => w[0].toUpperCase() + w.slice(1)).join(' ')
+      },
+      {
+        name: 'Sentence case',
+        desc: 'Natural text',
+        convert: words => {
+          if (words.length === 0) return '';
+          return words[0][0].toUpperCase() + words[0].slice(1) + (words.length > 1 ? ' ' + words.slice(1).join(' ') : '');
+        }
+      },
+      {
+        name: 'UPPERCASE',
+        desc: 'All caps',
+        convert: words => words.join(' ').toUpperCase()
+      },
+      {
+        name: 'lowercase',
+        desc: 'All lower',
+        convert: words => words.join(' ')
+      },
+    ];
+
+    function convertAll() {
+      const words = toWords(inputEl.value);
+
+      resultsEl.innerHTML = cases.map(c => {
+        const result = words.length > 0 ? c.convert(words) : '—';
+        return `
+          <div class="bg-white border rounded-lg p-3 flex items-center gap-3">
+            <div class="w-40 flex-shrink-0">
+              <span class="text-sm font-medium text-gray-700">${c.name}</span>
+              <span class="text-xs text-gray-400 ml-1">${c.desc}</span>
+            </div>
+            <div class="flex-1 mono text-gray-800 select-all truncate" title="${escapeAttr(result)}">${escapeHtml(result)}</div>
+            <button onclick="copyText(this, '${escapeAttr(result)}')" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex-shrink-0">Copy</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyText(btn, text) {
+      if (text === '—') return;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escapeAttr(s) {
+      return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    inputEl.addEventListener('input', convertAll);
+    convertAll();
+  </script>
+</body>
+</html>
