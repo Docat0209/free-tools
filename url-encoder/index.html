@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free URL Encoder/Decoder — Encode & Decode URLs Online | FreeTools</title>
+  <meta name="description" content="Encode and decode URLs, query strings, and URI components instantly. Supports encodeURIComponent, encodeURI, and base64 URL encoding. 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">URL Encoder/Decoder</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">URL Encoder / Decoder</h1>
+
+    <!-- Mode selector -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex gap-4 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="mode" value="component" checked class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">encodeURIComponent</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="mode" value="uri" class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">encodeURI</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="mode" value="base64url" class="text-blue-600 focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Base64 URL</span>
+        </label>
+      </div>
+      <p id="mode-desc" class="text-xs text-gray-500"></p>
+    </div>
+
+    <!-- Input -->
+    <div class="bg-white border rounded-lg p-5 mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-gray-700">Input</label>
+        <div class="flex gap-2">
+          <button onclick="document.getElementById('input').value=''; process();" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+          <button onclick="pasteInput()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Paste</button>
+        </div>
+      </div>
+      <textarea id="input" rows="4" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="Enter text or URL to encode/decode..."></textarea>
+      <span id="input-stats" class="text-xs text-gray-400 mt-1 block">0 characters</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mb-4">
+      <button onclick="encode()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Encode →</button>
+      <button onclick="decode()" class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400">← Decode</button>
+    </div>
+
+    <!-- Output -->
+    <div id="output-container" class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-medium text-gray-700">Output</label>
+        <button onclick="copyOutput()" id="copy-btn" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy</button>
+      </div>
+      <textarea id="output" rows="4" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y bg-gray-50" readonly></textarea>
+      <div class="flex items-center justify-between mt-1">
+        <span id="output-stats" class="text-xs text-gray-400">0 characters</span>
+        <button onclick="useAsInput()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Use as input ↑</button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg px-4 py-2 mb-4 text-sm text-red-700"></div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This URL Encoder/Decoder</h2>
+      <p>Encode and decode URLs and URI components using JavaScript's native encoding functions. All processing happens in your browser — nothing is sent to any server.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Encoding Modes</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>encodeURIComponent</strong> — Encodes all special characters. Best for query string values and path segments.</li>
+        <li><strong>encodeURI</strong> — Preserves URL structure characters (://?#@). Best for encoding full URLs.</li>
+        <li><strong>Base64 URL</strong> — URL-safe Base64 encoding (RFC 4648). Uses - and _ instead of + and /.</li>
+      </ul>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Common Use Cases</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li>Encode query parameters with special characters</li>
+        <li>Decode URLs from logs or analytics tools</li>
+        <li>Debug percent-encoded strings</li>
+        <li>Prepare strings for use in URLs</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+    const errorEl = document.getElementById('error');
+    const modeDescEl = document.getElementById('mode-desc');
+
+    const modeDescs = {
+      component: 'Encodes all characters except: A-Z a-z 0-9 - _ . ~ ! * \'( )',
+      uri: 'Preserves URL-safe characters: : / ? # [ ] @ ! $ & \' ( ) * + , ; = - _ . ~',
+      base64url: 'URL-safe Base64 encoding (RFC 4648). Uses - and _ instead of + and /'
+    };
+
+    function getMode() {
+      return document.querySelector('input[name="mode"]:checked').value;
+    }
+
+    function updateModeDesc() {
+      modeDescEl.textContent = modeDescs[getMode()];
+    }
+    updateModeDesc();
+
+    document.querySelectorAll('input[name="mode"]').forEach(r => {
+      r.addEventListener('change', updateModeDesc);
+    });
+
+    inputEl.addEventListener('input', () => {
+      document.getElementById('input-stats').textContent = inputEl.value.length + ' characters';
+    });
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+
+    function clearError() {
+      errorEl.classList.add('hidden');
+    }
+
+    function setOutput(text) {
+      outputEl.value = text;
+      document.getElementById('output-stats').textContent = text.length + ' characters';
+    }
+
+    function encode() {
+      clearError();
+      const input = inputEl.value;
+      const mode = getMode();
+      try {
+        let result;
+        if (mode === 'component') {
+          result = encodeURIComponent(input);
+        } else if (mode === 'uri') {
+          result = encodeURI(input);
+        } else {
+          // Base64 URL
+          const utf8 = new TextEncoder().encode(input);
+          let binary = '';
+          utf8.forEach(b => binary += String.fromCharCode(b));
+          result = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+        setOutput(result);
+      } catch (e) {
+        showError('Encode error: ' + e.message);
+      }
+    }
+
+    function decode() {
+      clearError();
+      const input = inputEl.value;
+      const mode = getMode();
+      try {
+        let result;
+        if (mode === 'component') {
+          result = decodeURIComponent(input);
+        } else if (mode === 'uri') {
+          result = decodeURI(input);
+        } else {
+          // Base64 URL decode
+          let base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) base64 += '=';
+          const binary = atob(base64);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          result = new TextDecoder().decode(bytes);
+        }
+        setOutput(result);
+      } catch (e) {
+        showError('Decode error: ' + e.message);
+      }
+    }
+
+    function process() {
+      clearError();
+      setOutput('');
+      document.getElementById('input-stats').textContent = inputEl.value.length + ' characters';
+    }
+
+    function copyOutput() {
+      const text = outputEl.value;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function useAsInput() {
+      inputEl.value = outputEl.value;
+      document.getElementById('input-stats').textContent = inputEl.value.length + ' characters';
+    }
+
+    async function pasteInput() {
+      try {
+        const text = await navigator.clipboard.readText();
+        inputEl.value = text;
+        document.getElementById('input-stats').textContent = text.length + ' characters';
+      } catch(e) {}
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Diff Checker — Compare Text Online | FreeTools</title>
+  <meta name="description" content="Compare two texts and see the differences highlighted. Line-by-line diff with additions, deletions, and modifications. No signup — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .mono { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; }
+    .diff-add { background-color: #dcfce7; }
+    .diff-del { background-color: #fee2e2; }
+    .diff-mod { background-color: #fef9c3; }
+    .line-num { color: #9ca3af; min-width: 40px; text-align: right; padding-right: 12px; user-select: none; }
+    .diff-line { border-bottom: 1px solid #f3f4f6; padding: 2px 8px; white-space: pre-wrap; word-break: break-all; }
+    .char-add { background-color: #86efac; border-radius: 2px; }
+    .char-del { background-color: #fca5a5; border-radius: 2px; text-decoration: line-through; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Diff Checker</span>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Diff Checker</h1>
+
+    <!-- Input -->
+    <div class="grid lg:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium text-gray-700">Original Text</label>
+          <button onclick="document.getElementById('text-a').value='';" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+        </div>
+        <textarea id="text-a" rows="12" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="Paste original text here..."></textarea>
+      </div>
+      <div class="bg-white border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium text-gray-700">Modified Text</label>
+          <button onclick="document.getElementById('text-b').value='';" class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+        </div>
+        <textarea id="text-b" rows="12" class="w-full mono border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y" placeholder="Paste modified text here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Options & Compare -->
+    <div class="flex items-center gap-4 mb-6">
+      <button onclick="compare()" class="bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Compare</button>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="opt-trim" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+        <span class="text-sm text-gray-700">Trim whitespace</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="opt-case" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+        <span class="text-sm text-gray-700">Ignore case</span>
+      </label>
+      <button onclick="swapTexts()" class="text-sm text-blue-600 hover:text-blue-800 font-medium ml-auto">Swap ⇄</button>
+    </div>
+
+    <!-- Stats -->
+    <div id="stats" class="hidden bg-white border rounded-lg p-4 mb-4">
+      <div class="flex gap-6 text-sm">
+        <span class="text-green-700"><strong id="stat-add">0</strong> additions</span>
+        <span class="text-red-700"><strong id="stat-del">0</strong> deletions</span>
+        <span class="text-yellow-700"><strong id="stat-mod">0</strong> modifications</span>
+        <span class="text-gray-500"><strong id="stat-same">0</strong> unchanged</span>
+      </div>
+    </div>
+
+    <!-- Diff output -->
+    <div id="diff-output" class="bg-white border rounded-lg overflow-hidden mb-6"></div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Diff Checker</h2>
+      <p>Compare two blocks of text and see exactly what changed. Line-by-line comparison with color-coded additions, deletions, and modifications — similar to <code>git diff</code> but in your browser.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Line-by-Line Diff</strong> — Clear visualization of every change</li>
+        <li><strong>Character-Level Highlighting</strong> — See exactly which characters changed within modified lines</li>
+        <li><strong>Options</strong> — Trim whitespace, ignore case for flexible comparison</li>
+        <li><strong>Statistics</strong> — Count of additions, deletions, modifications, and unchanged lines</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function swapTexts() {
+      const a = document.getElementById('text-a');
+      const b = document.getElementById('text-b');
+      const tmp = a.value;
+      a.value = b.value;
+      b.value = tmp;
+    }
+
+    // Myers diff algorithm (simplified LCS-based)
+    function diffLines(a, b) {
+      const n = a.length;
+      const m = b.length;
+
+      // Build LCS table
+      const dp = Array.from({length: n + 1}, () => new Array(m + 1).fill(0));
+      for (let i = 1; i <= n; i++) {
+        for (let j = 1; j <= m; j++) {
+          if (a[i-1] === b[j-1]) {
+            dp[i][j] = dp[i-1][j-1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+          }
+        }
+      }
+
+      // Backtrack to produce diff
+      const result = [];
+      let i = n, j = m;
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
+          result.unshift({type: 'same', a: a[i-1], b: b[j-1], lineA: i, lineB: j});
+          i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+          result.unshift({type: 'add', b: b[j-1], lineB: j});
+          j--;
+        } else {
+          result.unshift({type: 'del', a: a[i-1], lineA: i});
+          i--;
+        }
+      }
+
+      return result;
+    }
+
+    // Character-level diff for modified lines
+    function diffChars(a, b) {
+      const n = a.length;
+      const m = b.length;
+      const dp = Array.from({length: n + 1}, () => new Array(m + 1).fill(0));
+      for (let i = 1; i <= n; i++) {
+        for (let j = 1; j <= m; j++) {
+          dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+        }
+      }
+
+      const result = [];
+      let i = n, j = m;
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
+          result.unshift({type: 'same', char: a[i-1]});
+          i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+          result.unshift({type: 'add', char: b[j-1]});
+          j--;
+        } else {
+          result.unshift({type: 'del', char: a[i-1]});
+          i--;
+        }
+      }
+      return result;
+    }
+
+    function renderCharDiff(a, b) {
+      const chars = diffChars(a, b);
+      let html = '';
+      for (const c of chars) {
+        if (c.type === 'same') {
+          html += escapeHtml(c.char);
+        } else if (c.type === 'add') {
+          html += '<span class="char-add">' + escapeHtml(c.char) + '</span>';
+        } else {
+          html += '<span class="char-del">' + escapeHtml(c.char) + '</span>';
+        }
+      }
+      return html;
+    }
+
+    function compare() {
+      const trimWs = document.getElementById('opt-trim').checked;
+      const ignoreCase = document.getElementById('opt-case').checked;
+
+      let textA = document.getElementById('text-a').value;
+      let textB = document.getElementById('text-b').value;
+
+      let linesA = textA.split('\n');
+      let linesB = textB.split('\n');
+
+      // Prepare comparison versions
+      let cmpA = linesA.map(l => {
+        let s = l;
+        if (trimWs) s = s.trim();
+        if (ignoreCase) s = s.toLowerCase();
+        return s;
+      });
+      let cmpB = linesB.map(l => {
+        let s = l;
+        if (trimWs) s = s.trim();
+        if (ignoreCase) s = s.toLowerCase();
+        return s;
+      });
+
+      const diff = diffLines(cmpA, cmpB);
+
+      // Detect modifications (adjacent del+add pairs)
+      const processed = [];
+      let idx = 0;
+      while (idx < diff.length) {
+        if (diff[idx].type === 'del' && idx + 1 < diff.length && diff[idx + 1].type === 'add') {
+          processed.push({
+            type: 'mod',
+            a: linesA[diff[idx].lineA - 1],
+            b: linesB[diff[idx + 1].lineB - 1],
+            lineA: diff[idx].lineA,
+            lineB: diff[idx + 1].lineB
+          });
+          idx += 2;
+        } else {
+          const d = diff[idx];
+          if (d.type === 'same') {
+            d.a = linesA[d.lineA - 1];
+            d.b = linesB[d.lineB - 1];
+          } else if (d.type === 'del') {
+            d.a = linesA[d.lineA - 1];
+          } else {
+            d.b = linesB[d.lineB - 1];
+          }
+          processed.push(d);
+          idx++;
+        }
+      }
+
+      // Stats
+      let adds = 0, dels = 0, mods = 0, same = 0;
+      processed.forEach(d => {
+        if (d.type === 'add') adds++;
+        else if (d.type === 'del') dels++;
+        else if (d.type === 'mod') mods++;
+        else same++;
+      });
+
+      document.getElementById('stat-add').textContent = adds;
+      document.getElementById('stat-del').textContent = dels;
+      document.getElementById('stat-mod').textContent = mods;
+      document.getElementById('stat-same').textContent = same;
+      document.getElementById('stats').classList.remove('hidden');
+
+      // Render
+      const outputEl = document.getElementById('diff-output');
+
+      if (adds === 0 && dels === 0 && mods === 0) {
+        outputEl.innerHTML = '<div class="p-8 text-center text-gray-500">No differences found. The texts are identical.</div>';
+        return;
+      }
+
+      let html = '<div class="overflow-x-auto">';
+      processed.forEach(d => {
+        if (d.type === 'same') {
+          html += '<div class="diff-line flex mono"><span class="line-num">' + d.lineA + '</span><span class="line-num">' + d.lineB + '</span><span class="px-2 text-gray-400 w-6"> </span><span class="flex-1">' + escapeHtml(d.a) + '</span></div>';
+        } else if (d.type === 'del') {
+          html += '<div class="diff-line diff-del flex mono"><span class="line-num">' + d.lineA + '</span><span class="line-num"></span><span class="px-2 text-red-600 w-6 font-bold">-</span><span class="flex-1">' + escapeHtml(d.a) + '</span></div>';
+        } else if (d.type === 'add') {
+          html += '<div class="diff-line diff-add flex mono"><span class="line-num"></span><span class="line-num">' + d.lineB + '</span><span class="px-2 text-green-600 w-6 font-bold">+</span><span class="flex-1">' + escapeHtml(d.b) + '</span></div>';
+        } else if (d.type === 'mod') {
+          const charHtml = renderCharDiff(d.a, d.b);
+          html += '<div class="diff-line diff-mod flex mono"><span class="line-num">' + d.lineA + '</span><span class="line-num">' + d.lineB + '</span><span class="px-2 text-yellow-600 w-6 font-bold">~</span><span class="flex-1">' + charHtml + '</span></div>';
+        }
+      });
+      html += '</div>';
+      outputEl.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
