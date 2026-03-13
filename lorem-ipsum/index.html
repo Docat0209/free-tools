@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Lorem Ipsum Generator — Placeholder Text for Designers & Developers | FreeTools</title>
+  <meta name="description" content="Generate lorem ipsum placeholder text instantly. Choose paragraphs, sentences, or words. Copy with one click. No signup, no data collection — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .output-text { font-family: Georgia, 'Times New Roman', serif; line-height: 1.8; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Lorem Ipsum Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Lorem Ipsum Generator</h1>
+
+    <!-- Controls -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="amount" class="text-sm font-medium text-gray-700 block mb-1">Amount</label>
+          <input type="number" id="amount" min="1" max="100" value="5" class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Type</label>
+          <select id="unit" class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-start" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Start with "Lorem ipsum dolor sit amet..."</span>
+        </label>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="generateLorem()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Generate</button>
+        <button onclick="copyText()" id="copy-btn" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">Copy</button>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div id="output-container" class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <span id="stats" class="text-xs text-gray-500"></span>
+        <button onclick="copyText()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy to clipboard</button>
+      </div>
+      <div id="output" class="output-text text-gray-800"></div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Lorem Ipsum Generator</h2>
+      <p>Generate placeholder text for your designs, mockups, and prototypes. Lorem ipsum has been the industry standard dummy text since the 1500s, and this tool makes it easy to generate exactly the amount you need.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Flexible Output</strong> — Generate by paragraphs, sentences, or words</li>
+        <li><strong>Classic Start</strong> — Option to begin with the traditional "Lorem ipsum dolor sit amet..."</li>
+        <li><strong>One-Click Copy</strong> — Copy generated text to clipboard instantly</li>
+        <li><strong>Word & Character Count</strong> — See stats for your generated text</li>
+        <li><strong>Privacy</strong> — 100% client-side, no data leaves your browser</li>
+      </ul>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">What is Lorem Ipsum?</h3>
+      <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups. It originates from a scrambled passage of Cicero's "De Finibus Bonorum et Malorum" (45 BC).</p>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const WORDS = [
+      'lorem','ipsum','dolor','sit','amet','consectetur','adipiscing','elit',
+      'sed','do','eiusmod','tempor','incididunt','ut','labore','et','dolore',
+      'magna','aliqua','enim','ad','minim','veniam','quis','nostrud',
+      'exercitation','ullamco','laboris','nisi','aliquip','ex','ea','commodo',
+      'consequat','duis','aute','irure','in','reprehenderit','voluptate',
+      'velit','esse','cillum','fugiat','nulla','pariatur','excepteur','sint',
+      'occaecat','cupidatat','non','proident','sunt','culpa','qui','officia',
+      'deserunt','mollit','anim','id','est','laborum','at','vero','eos',
+      'accusamus','iusto','odio','dignissimos','ducimus','blanditiis',
+      'praesentium','voluptatum','deleniti','atque','corrupti','quos',
+      'dolores','quas','molestias','recusandae','itaque','earum','rerum',
+      'hic','tenetur','sapiente','delectus','aut','reiciendis','voluptatibus',
+      'maiores','alias','consequatur','perferendis','doloribus','asperiores',
+      'repellat','temporibus','autem','quibusdam','officiis','debitis',
+      'necessitatibus','saepe','eveniet','voluptates','repudiandae',
+      'recusandae','nihil','impedit','quo','minus','placeat','facere',
+      'possimus','omnis','voluptas','assumenda','nemo','ipsam','voluptatem',
+      'quia','numquam','eius','modi','tempora','magni','ratione',
+      'sequi','nesciunt','neque','porro','quisquam','dolorem','adipisci',
+      'veritatis','quasi','architecto','beatae','vitae','dicta','explicabo',
+      'aspernatur','odit','fugit','harum','inventore','perspiciatis','unde',
+      'totam','rem','aperiam','eaque','ipsa','quae','ab','illo',
+      'laudantium','similique','optio','cumque','nihil','impedit',
+      'maxime','mollitia','animi','provident','pariatur'
+    ];
+
+    const CLASSIC_START = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+
+    function randomWord() {
+      return WORDS[Math.floor(Math.random() * WORDS.length)];
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function generateSentence(minWords, maxWords) {
+      const len = minWords + Math.floor(Math.random() * (maxWords - minWords + 1));
+      const words = [];
+      for (let i = 0; i < len; i++) {
+        words.push(randomWord());
+      }
+      words[0] = capitalize(words[0]);
+
+      // Add a comma at a natural point in longer sentences
+      if (len > 8) {
+        const commaPos = 3 + Math.floor(Math.random() * (len - 6));
+        words[commaPos] = words[commaPos] + ',';
+      }
+
+      return words.join(' ') + '.';
+    }
+
+    function generateParagraph(sentenceCount) {
+      const count = sentenceCount || 4 + Math.floor(Math.random() * 4);
+      const sentences = [];
+      for (let i = 0; i < count; i++) {
+        sentences.push(generateSentence(6, 16));
+      }
+      return sentences.join(' ');
+    }
+
+    function generateLorem() {
+      const amount = Math.max(1, Math.min(100, parseInt(document.getElementById('amount').value, 10) || 5));
+      const unit = document.getElementById('unit').value;
+      const startClassic = document.getElementById('opt-start').checked;
+
+      let result = '';
+
+      if (unit === 'paragraphs') {
+        const paragraphs = [];
+        for (let i = 0; i < amount; i++) {
+          paragraphs.push(generateParagraph());
+        }
+        if (startClassic) {
+          paragraphs[0] = CLASSIC_START + ' ' + paragraphs[0];
+        }
+        result = paragraphs.join('\n\n');
+        renderParagraphs(paragraphs);
+      } else if (unit === 'sentences') {
+        const sentences = [];
+        for (let i = 0; i < amount; i++) {
+          sentences.push(generateSentence(6, 16));
+        }
+        if (startClassic) {
+          sentences[0] = CLASSIC_START;
+        }
+        result = sentences.join(' ');
+        document.getElementById('output').innerHTML = '<p class="mb-0">' + escapeHtml(result) + '</p>';
+      } else {
+        // words
+        const words = [];
+        for (let i = 0; i < amount; i++) {
+          words.push(randomWord());
+        }
+        if (startClassic && amount >= 5) {
+          const classicWords = ['lorem','ipsum','dolor','sit','amet'];
+          for (let i = 0; i < Math.min(5, amount); i++) {
+            words[i] = classicWords[i];
+          }
+        }
+        result = words.join(' ');
+        document.getElementById('output').innerHTML = '<p class="mb-0">' + escapeHtml(result) + '</p>';
+      }
+
+      // Stats
+      const wordCount = result.split(/\s+/).filter(w => w.length > 0).length;
+      const charCount = result.length;
+      document.getElementById('stats').textContent = wordCount + ' words, ' + charCount + ' characters';
+
+      // Store for copying
+      document.getElementById('output').dataset.text = result;
+    }
+
+    function renderParagraphs(paragraphs) {
+      const output = document.getElementById('output');
+      output.innerHTML = paragraphs.map(p => '<p class="mb-4 last:mb-0">' + escapeHtml(p) + '</p>').join('');
+    }
+
+    function copyText() {
+      const text = document.getElementById('output').dataset.text;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const container = document.getElementById('output-container');
+        btn.textContent = 'Copied!';
+        btn.classList.add('bg-green-100');
+        btn.classList.remove('bg-gray-100');
+        container.classList.add('copy-flash');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('bg-green-100');
+          btn.classList.add('bg-gray-100');
+          container.classList.remove('copy-flash');
+        }, 1500);
+      });
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // Auto-generate on load and on input change
+    generateLorem();
+    document.getElementById('amount').addEventListener('input', generateLorem);
+    document.getElementById('unit').addEventListener('change', generateLorem);
+    document.getElementById('opt-start').addEventListener('change', generateLorem);
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Word Counter — Count Words, Characters, Sentences Online | FreeTools</title>
+  <meta name="description" content="Free online word counter tool. Count words, characters, sentences, paragraphs, and estimate reading/speaking time. Top keyword frequency analysis. No signup, runs in your browser.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    textarea { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; line-height: 1.7; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .keyword-bar { transition: width 0.3s ease; }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Word Counter</span>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-xl font-bold text-gray-900">Word Counter</h1>
+      <div class="flex gap-2">
+        <button onclick="copyStats()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">Copy Stats</button>
+        <button onclick="clearText()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-200">Clear</button>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg fade-in z-50"></div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-blue-600" id="stat-words">0</div>
+        <div class="text-xs text-gray-500 mt-1">Words</div>
+      </div>
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-purple-600" id="stat-chars">0</div>
+        <div class="text-xs text-gray-500 mt-1">Characters</div>
+      </div>
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-purple-400" id="stat-chars-no-space">0</div>
+        <div class="text-xs text-gray-500 mt-1">Chars (no spaces)</div>
+      </div>
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-green-600" id="stat-sentences">0</div>
+        <div class="text-xs text-gray-500 mt-1">Sentences</div>
+      </div>
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-orange-600" id="stat-paragraphs">0</div>
+        <div class="text-xs text-gray-500 mt-1">Paragraphs</div>
+      </div>
+      <div class="stat-card bg-white rounded-lg p-4 border text-center">
+        <div class="text-2xl font-bold text-red-500" id="stat-reading">0s</div>
+        <div class="text-xs text-gray-500 mt-1">Reading Time</div>
+      </div>
+    </div>
+
+    <!-- Speaking time sub-row -->
+    <div class="flex gap-3 mb-4">
+      <div class="stat-card bg-white rounded-lg px-4 py-2 border flex items-center gap-2 text-sm">
+        <span class="text-gray-500">Speaking time:</span>
+        <span class="font-semibold text-gray-900" id="stat-speaking">0s</span>
+      </div>
+      <div class="stat-card bg-white rounded-lg px-4 py-2 border flex items-center gap-2 text-sm">
+        <span class="text-gray-500">Avg word length:</span>
+        <span class="font-semibold text-gray-900" id="stat-avg-word">0</span>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-4">
+      <!-- Textarea -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-sm font-medium text-gray-600">Your Text</label>
+          <button onclick="pasteFromClipboard()" class="text-xs text-blue-600 hover:text-blue-800">Paste from clipboard</button>
+        </div>
+        <textarea id="input" rows="22" class="w-full border rounded-lg p-4 bg-white resize-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Start typing or paste your text here..." oninput="analyze()"></textarea>
+      </div>
+
+      <!-- Keyword Frequency -->
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-sm font-medium text-gray-600">Top Keywords</label>
+          <span class="text-xs text-gray-400" id="keyword-count">0 unique words</span>
+        </div>
+        <div class="bg-white border rounded-lg p-4 h-full min-h-0" style="min-height: 420px;">
+          <div id="keywords" class="space-y-2 text-sm">
+            <p class="text-gray-400 text-center mt-8">Keywords will appear here as you type...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Word Counter</h2>
+      <p>This free word counter instantly analyzes your text as you type. Count words, characters (with and without spaces), sentences, and paragraphs. Get reading and speaking time estimates based on average speeds of 200 and 130 words per minute respectively.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Real-time counting</strong> — Stats update instantly as you type</li>
+        <li><strong>Keyword analysis</strong> — See your top 10 most-used words (excluding common stop words)</li>
+        <li><strong>Reading time</strong> — Based on 200 words per minute average reading speed</li>
+        <li><strong>Speaking time</strong> — Based on 130 words per minute average speaking speed</li>
+        <li><strong>Copy stats</strong> — Export all stats to clipboard in one click</li>
+        <li><strong>Privacy</strong> — 100% client-side, your text never leaves your browser</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const inputEl = document.getElementById('input');
+
+    const STOP_WORDS = new Set([
+      'the','be','to','of','and','a','in','that','have','i','it','for','not','on','with',
+      'he','as','you','do','at','this','but','his','by','from','they','we','say','her',
+      'she','or','an','will','my','one','all','would','there','their','what','so','up',
+      'out','if','about','who','get','which','go','me','when','make','can','like','time',
+      'no','just','him','know','take','people','into','year','your','good','some','could',
+      'them','see','other','than','then','now','look','only','come','its','over','think',
+      'also','back','after','use','two','how','our','work','first','well','way','even',
+      'new','want','because','any','these','give','day','most','us','is','am','are','was',
+      'were','been','being','has','had','did','doing','does','the','a','an','and','but',
+      'or','nor','for','yet','so','in','on','at','to','by','up','as','it','he','she',
+      'we','they','i','you','very','really','much','more','many','such','own','same',
+      'able','just','ever','still','already','also','though','through','too','should',
+      'must','may','might','shall','need','each','every','both','few','many','most',
+      'other','some','such','only','own','while','where','here','when','why','how','what',
+      'which','who','whom','this','that','these','those','am','is','are','was','were',
+      'be','been','being','have','has','had','having','do','does','did','doing','will',
+      'would','could','should','may','might','shall','can','need','dare','ought','used',
+      'going','got','cannot','let','made','said','keep','went','come','came','done','put',
+      'before','between','during','without','again','further','once','here','there',
+      'all','each','every','both','few','more','most','other','some','such','no','not',
+      'only','same','than','too','very','just','because','but','and','or','if','then'
+    ]);
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return [];
+      return trimmed.match(/[\w']+/g) || [];
+    }
+
+    function countSentences(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      const matches = trimmed.match(/[.!?]+(?:\s|$)/g);
+      return matches ? matches.length : (trimmed.length > 0 ? 1 : 0);
+    }
+
+    function countParagraphs(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      return trimmed.split(/\n\s*\n/).filter(p => p.trim().length > 0).length || (trimmed.length > 0 ? 1 : 0);
+    }
+
+    function formatTime(minutes) {
+      if (minutes < 1) {
+        const seconds = Math.round(minutes * 60);
+        return seconds + 's';
+      }
+      const m = Math.floor(minutes);
+      const s = Math.round((minutes - m) * 60);
+      if (m === 0) return s + 's';
+      if (s === 0) return m + 'min';
+      return m + 'min ' + s + 's';
+    }
+
+    function getKeywordFrequency(words) {
+      const freq = {};
+      for (const word of words) {
+        const lower = word.toLowerCase().replace(/^'+|'+$/g, '');
+        if (lower.length < 2) continue;
+        if (STOP_WORDS.has(lower)) continue;
+        if (/^\d+$/.test(lower)) continue;
+        freq[lower] = (freq[lower] || 0) + 1;
+      }
+      return Object.entries(freq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+    }
+
+    function analyze() {
+      const text = inputEl.value;
+      const words = countWords(text);
+      const wordCount = words.length;
+      const charCount = text.length;
+      const charNoSpace = text.replace(/\s/g, '').length;
+      const sentenceCount = countSentences(text);
+      const paragraphCount = countParagraphs(text);
+      const readingTime = wordCount / 200;
+      const speakingTime = wordCount / 130;
+      const avgWordLen = wordCount > 0 ? (words.reduce((sum, w) => sum + w.length, 0) / wordCount).toFixed(1) : '0';
+
+      document.getElementById('stat-words').textContent = wordCount.toLocaleString();
+      document.getElementById('stat-chars').textContent = charCount.toLocaleString();
+      document.getElementById('stat-chars-no-space').textContent = charNoSpace.toLocaleString();
+      document.getElementById('stat-sentences').textContent = sentenceCount.toLocaleString();
+      document.getElementById('stat-paragraphs').textContent = paragraphCount.toLocaleString();
+      document.getElementById('stat-reading').textContent = formatTime(readingTime);
+      document.getElementById('stat-speaking').textContent = formatTime(speakingTime);
+      document.getElementById('stat-avg-word').textContent = avgWordLen + ' chars';
+
+      // Keyword frequency
+      const keywords = getKeywordFrequency(words);
+      const keywordsEl = document.getElementById('keywords');
+      const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/^'+|'+$/g, '')).filter(w => w.length >= 2));
+      document.getElementById('keyword-count').textContent = uniqueWords.size + ' unique words';
+
+      if (keywords.length === 0) {
+        keywordsEl.innerHTML = '<p class="text-gray-400 text-center mt-8">Keywords will appear here as you type...</p>';
+        return;
+      }
+
+      const maxCount = keywords[0][1];
+      keywordsEl.innerHTML = keywords.map(([word, count]) => {
+        const pct = (count / maxCount) * 100;
+        return `
+          <div class="flex items-center gap-2">
+            <span class="w-24 truncate font-medium text-gray-800" title="${word}">${word}</span>
+            <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+              <div class="keyword-bar bg-blue-500 h-5 rounded-full" style="width: ${pct}%"></div>
+            </div>
+            <span class="text-gray-500 w-8 text-right">${count}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function clearText() {
+      inputEl.value = '';
+      analyze();
+      inputEl.focus();
+    }
+
+    function copyStats() {
+      const text = inputEl.value;
+      const words = countWords(text);
+      const wordCount = words.length;
+      const charCount = text.length;
+      const charNoSpace = text.replace(/\s/g, '').length;
+      const sentenceCount = countSentences(text);
+      const paragraphCount = countParagraphs(text);
+      const readingTime = formatTime(wordCount / 200);
+      const speakingTime = formatTime(wordCount / 130);
+
+      const stats = [
+        `Words: ${wordCount}`,
+        `Characters: ${charCount}`,
+        `Characters (no spaces): ${charNoSpace}`,
+        `Sentences: ${sentenceCount}`,
+        `Paragraphs: ${paragraphCount}`,
+        `Reading time: ${readingTime}`,
+        `Speaking time: ${speakingTime}`
+      ].join('\n');
+
+      navigator.clipboard.writeText(stats).then(() => {
+        showToast('Stats copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy. Try again.');
+      });
+    }
+
+    function pasteFromClipboard() {
+      navigator.clipboard.readText().then(text => {
+        inputEl.value = text;
+        analyze();
+      }).catch(() => {
+        showToast('Cannot read clipboard. Paste manually with Ctrl+V.');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 2000);
+    }
+
+    analyze();
+  </script>
+</body>
+</html>

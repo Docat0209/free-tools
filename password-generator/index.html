@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Password Generator — Strong, Random, Secure | FreeTools</title>
+  <meta name="description" content="Generate strong, random passwords instantly in your browser. Customize length, characters, and strength. No signup, no data collection — 100% client-side.">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .password-display { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 18px; letter-spacing: 1px; word-break: break-all; }
+    .strength-bar { transition: width 0.3s ease, background-color 0.3s ease; }
+    .copy-flash { animation: flash 0.4s ease; }
+    @keyframes flash { 0%{background-color:#d1fae5} 100%{background-color:transparent} }
+    .bulk-pw { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <a href="/free-tools/" class="text-lg font-bold text-gray-900">FreeTools</a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-700">Password Generator</span>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Password Generator</h1>
+
+    <!-- Main password display -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-start gap-3">
+        <div id="password-display" class="password-display flex-1 text-gray-900 min-h-[28px] select-all" aria-live="polite" aria-label="Generated password"></div>
+        <button onclick="copyPassword()" id="copy-btn" class="flex-shrink-0 bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Copy password to clipboard">Copy</button>
+        <button onclick="generate()" class="flex-shrink-0 bg-gray-100 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400" aria-label="Generate new password">&#8635;</button>
+      </div>
+
+      <!-- Strength indicator -->
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs text-gray-500">Strength</span>
+          <span id="strength-label" class="text-xs font-semibold"></span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="strength-bar" class="strength-bar h-2 rounded-full" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="bg-white border rounded-lg p-5 mb-6">
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <label for="length-slider" class="text-sm font-medium text-gray-700">Password Length</label>
+          <input type="number" id="length-input" min="8" max="128" value="16" class="w-16 text-center border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="Password length">
+        </div>
+        <input type="range" id="length-slider" min="8" max="128" value="16" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" aria-label="Password length slider">
+        <div class="flex justify-between text-xs text-gray-400 mt-1">
+          <span>8</span>
+          <span>128</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-upper" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Uppercase (A-Z)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-lower" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Lowercase (a-z)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-numbers" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Numbers (0-9)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="opt-symbols" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-400">
+          <span class="text-sm text-gray-700">Symbols (!@#$...)</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mb-6">
+      <button onclick="generate()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">Generate Password</button>
+      <button onclick="generateBulk()" class="flex-1 bg-gray-100 text-gray-700 px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">Generate 5 Passwords</button>
+    </div>
+
+    <!-- Bulk passwords -->
+    <div id="bulk-section" class="hidden bg-white border rounded-lg p-5 mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-medium text-gray-700">Bulk Passwords</span>
+        <button onclick="copyBulk()" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Copy all</button>
+      </div>
+      <div id="bulk-list" class="space-y-2"></div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="mt-12 prose max-w-none text-gray-600 text-sm">
+      <h2 class="text-lg font-semibold text-gray-900">About This Password Generator</h2>
+      <p>This free password generator creates cryptographically random passwords directly in your browser using the <code>crypto.getRandomValues()</code> API. No passwords are sent to any server — everything runs locally for maximum privacy and security.</p>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Features</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li><strong>Cryptographically Secure</strong> — Uses the Web Crypto API for true randomness</li>
+        <li><strong>Customizable</strong> — Choose length (8-128) and character types</li>
+        <li><strong>Strength Indicator</strong> — Visual feedback on password strength</li>
+        <li><strong>Bulk Generation</strong> — Generate 5 passwords at once</li>
+        <li><strong>Privacy</strong> — 100% client-side, your passwords never leave your browser</li>
+      </ul>
+      <h3 class="text-base font-semibold text-gray-900 mt-4">Tips for Strong Passwords</h3>
+      <ul class="list-disc pl-5 space-y-1">
+        <li>Use at least 16 characters for important accounts</li>
+        <li>Include uppercase, lowercase, numbers, and symbols</li>
+        <li>Never reuse passwords across different sites</li>
+        <li>Use a password manager to store your passwords securely</li>
+      </ul>
+      <p class="mt-4">Building AI tools? Check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> to turn any REST API into AI-callable tools, or <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> for GraphQL APIs.</p>
+    </div>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-4 border-t text-center text-sm text-gray-500">
+    <p>Made with care. Also check out <a href="https://www.npmjs.com/package/mcp-openapi" class="text-blue-600 hover:underline">mcp-openapi</a> and <a href="https://www.npmjs.com/package/graphql-to-mcp" class="text-blue-600 hover:underline">graphql-to-mcp</a> — AI tools for developers.</p>
+    <p class="mt-2"><a href="https://buymeacoffee.com/docat0209" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-yellow-600 transition">&#9749; Buy me a coffee</a></p>
+  </footer>
+
+  <script>
+    const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+    const NUMBERS = '0123456789';
+    const SYMBOLS = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+    const sliderEl = document.getElementById('length-slider');
+    const lengthInputEl = document.getElementById('length-input');
+    const displayEl = document.getElementById('password-display');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthLabel = document.getElementById('strength-label');
+
+    const checkboxes = {
+      upper: document.getElementById('opt-upper'),
+      lower: document.getElementById('opt-lower'),
+      numbers: document.getElementById('opt-numbers'),
+      symbols: document.getElementById('opt-symbols'),
+    };
+
+    // Sync slider and number input
+    sliderEl.addEventListener('input', () => {
+      lengthInputEl.value = sliderEl.value;
+      generate();
+    });
+
+    lengthInputEl.addEventListener('input', () => {
+      let v = parseInt(lengthInputEl.value, 10);
+      if (isNaN(v)) return;
+      v = Math.max(8, Math.min(128, v));
+      sliderEl.value = v;
+      generate();
+    });
+
+    lengthInputEl.addEventListener('blur', () => {
+      let v = parseInt(lengthInputEl.value, 10);
+      if (isNaN(v) || v < 8) v = 8;
+      if (v > 128) v = 128;
+      lengthInputEl.value = v;
+      sliderEl.value = v;
+      generate();
+    });
+
+    // Re-generate on checkbox change
+    Object.values(checkboxes).forEach(cb => {
+      cb.addEventListener('change', () => {
+        ensureAtLeastOne(cb);
+        generate();
+      });
+    });
+
+    function ensureAtLeastOne(changed) {
+      const anyChecked = Object.values(checkboxes).some(cb => cb.checked);
+      if (!anyChecked) {
+        changed.checked = true;
+      }
+    }
+
+    function getCharset() {
+      let charset = '';
+      if (checkboxes.upper.checked) charset += UPPER;
+      if (checkboxes.lower.checked) charset += LOWER;
+      if (checkboxes.numbers.checked) charset += NUMBERS;
+      if (checkboxes.symbols.checked) charset += SYMBOLS;
+      return charset;
+    }
+
+    function generatePassword(length) {
+      const charset = getCharset();
+      if (!charset) return '';
+      const array = new Uint32Array(length);
+      crypto.getRandomValues(array);
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        password += charset[array[i] % charset.length];
+      }
+      return password;
+    }
+
+    function calcStrength(password) {
+      const len = password.length;
+      let poolSize = 0;
+      if (/[a-z]/.test(password)) poolSize += 26;
+      if (/[A-Z]/.test(password)) poolSize += 26;
+      if (/[0-9]/.test(password)) poolSize += 10;
+      if (/[^a-zA-Z0-9]/.test(password)) poolSize += 30;
+
+      const entropy = len * Math.log2(poolSize || 1);
+
+      if (entropy < 40) return { label: 'Weak', color: '#ef4444', pct: 20 };
+      if (entropy < 60) return { label: 'Fair', color: '#f59e0b', pct: 45 };
+      if (entropy < 80) return { label: 'Strong', color: '#22c55e', pct: 70 };
+      return { label: 'Very Strong', color: '#16a34a', pct: 100 };
+    }
+
+    function updateStrength(password) {
+      const s = calcStrength(password);
+      strengthBar.style.width = s.pct + '%';
+      strengthBar.style.backgroundColor = s.color;
+      strengthLabel.textContent = s.label;
+      strengthLabel.style.color = s.color;
+    }
+
+    function generate() {
+      const length = parseInt(sliderEl.value, 10);
+      const pw = generatePassword(length);
+      displayEl.textContent = pw;
+      updateStrength(pw);
+    }
+
+    function copyPassword() {
+      const pw = displayEl.textContent;
+      if (!pw) return;
+      navigator.clipboard.writeText(pw).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('bg-green-600');
+        btn.classList.remove('bg-blue-600');
+        displayEl.classList.add('copy-flash');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('bg-green-600');
+          btn.classList.add('bg-blue-600');
+          displayEl.classList.remove('copy-flash');
+        }, 1500);
+      });
+    }
+
+    function generateBulk() {
+      const length = parseInt(sliderEl.value, 10);
+      const section = document.getElementById('bulk-section');
+      const list = document.getElementById('bulk-list');
+      section.classList.remove('hidden');
+      list.innerHTML = '';
+
+      for (let i = 0; i < 5; i++) {
+        const pw = generatePassword(length);
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 bg-gray-50 rounded';
+        row.innerHTML = `
+          <span class="bulk-pw flex-1 select-all text-gray-800">${escapeHtml(pw)}</span>
+          <button onclick="copySingle(this, '${escapeAttr(pw)}')" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex-shrink-0">Copy</button>
+        `;
+        list.appendChild(row);
+      }
+    }
+
+    function copySingle(btn, pw) {
+      navigator.clipboard.writeText(pw).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1200);
+      });
+    }
+
+    function copyBulk() {
+      const items = document.querySelectorAll('#bulk-list .bulk-pw');
+      const text = Array.from(items).map(el => el.textContent).join('\n');
+      navigator.clipboard.writeText(text);
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function escapeAttr(s) {
+      return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // Generate on load
+    generate();
+  </script>
+</body>
+</html>
