@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://docat0209.github.io/free-tools/sitemap.xml
